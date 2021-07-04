@@ -11,8 +11,8 @@ namespace Nodex.Classes
     {
         public NodeCategory category { get; }
         public string label { get; }
-        public NodeInput[] inputs { get; }
-        public NodeOutput[] outputs { get; }
+        public NodeIO[] inputs { get; }
+        public NodeIO[] outputs { get; }
         public NodeProperty[] properties { get; }
 
         public enum NodeCategory
@@ -22,7 +22,7 @@ namespace Nodex.Classes
             Texture = 2
         }
 
-        public Node(NodeCategory category, string label, NodeInput[] inputs, NodeOutput[] outputs, NodeProperty[] properties)
+        public Node(NodeCategory category, string label, NodeIO[] inputs, NodeIO[] outputs, NodeProperty[] properties)
         {
             this.category = category;
             this.label = label;

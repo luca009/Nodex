@@ -21,39 +21,53 @@ namespace Nodex.Resources.Controls
     /// </summary>
     public partial class NodeInputControl : UserControl
     {
-        public NodeInput.NodeInputCategory NodeInputCategory { get; set; }
+        public NodeIO.NodeIOCategory NodeIOCategory { get; set; }
         public string Label { get; set; }
-        public new delegate void MouseLeftButtonDown(object sender, MouseEventArgs e);
-        public new delegate void MouseLeftButtonUp(object sender, MouseEventArgs e);
+        public delegate void MouseLeftButtonDownHandler(object sender, MouseEventArgs e);
+        public delegate void MouseLeftButtonUpHandler(object sender, MouseEventArgs e);
+        public new event MouseLeftButtonDownHandler MouseLeftButtonDown;
+        public new event MouseLeftButtonUpHandler MouseLeftButtonUp;
 
         public NodeInputControl()
         {
             InitializeComponent();
         }
 
-        public NodeInputControl(NodeInput nodeInput)
+        public NodeInputControl(NodeIO nodeIO)
         {
             InitializeComponent();
 
-            Label = nodeInput.label;
+            Label = nodeIO.label;
             textLabel.Text = Label;
 
-            NodeInputCategory = nodeInput.category;
+            NodeIOCategory = nodeIO.category;
 
-            switch (NodeInputCategory)
+            switch (NodeIOCategory)
             {
-                case NodeInput.NodeInputCategory.Undefined:
+                case NodeIO.NodeIOCategory.Undefined:
                     ellipseIn.Fill = new LinearGradientBrush(Color.FromRgb(185, 185, 185), Color.FromRgb(64, 64, 64), 90);
                     break;
-                case NodeInput.NodeInputCategory.Image:
+                case NodeIO.NodeIOCategory.Image:
                     ellipseIn.Fill = new LinearGradientBrush(Color.FromRgb(255, 235, 40), Color.FromRgb(100, 90, 0), 90);
                     break;
-                case NodeInput.NodeInputCategory.Number:
+                case NodeIO.NodeIOCategory.Number:
                     ellipseIn.Fill = new LinearGradientBrush(Color.FromRgb(255, 255, 255), Color.FromRgb(90, 90, 90), 90);
                     break;
                 default:
                     break;
             }
+        }
+
+        private void ellipseIn_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (MouseLeftButtonDown != null)
+                MouseLeftButtonDown(sender, e);
+        }
+
+        private void ellipseIn_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (MouseLeftButtonUp != null)
+                MouseLeftButtonUp(sender, e);
         }
     }
 }

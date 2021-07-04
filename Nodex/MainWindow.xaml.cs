@@ -32,8 +32,8 @@ namespace Nodex
         {
             NodeControl nodeControl = new NodeControl(new Node(Node.NodeCategory.Input,
                 "test",
-                new NodeInput[] { new NodeInput(NodeInput.NodeInputCategory.Image, "Image"), new NodeInput(NodeInput.NodeInputCategory.Number, "Number") },
-                new NodeOutput[] { new NodeOutput(NodeOutput.NodeOutputCategory.Undefined, "Undefined") },
+                new NodeIO[] { new NodeIO(NodeIO.NodeIOCategory.Image, "Image", NodeIO.NodeIOType.Input), new NodeIO(NodeIO.NodeIOCategory.Number, "Number", NodeIO.NodeIOType.Input) },
+                new NodeIO[] { new NodeIO(NodeIO.NodeIOCategory.Undefined, "Undefined", NodeIO.NodeIOType.Output) },
                 new NodeProperty[] { new NodeProperty(new Button(), "property") }))
                 { Width = 200, Height = 200, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top };
             gridNodeSpace.Children.Add(nodeControl);

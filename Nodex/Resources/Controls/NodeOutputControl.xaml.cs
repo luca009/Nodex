@@ -21,37 +21,53 @@ namespace Nodex.Resources.Controls
     /// </summary>
     public partial class NodeOutputControl : UserControl
     {
-        public NodeOutput.NodeOutputCategory NodeOutputCategory { get; set; }
+        public NodeIO.NodeIOCategory NodeIOCategory { get; set; }
         public string Label { get; set; }
+        public delegate void MouseLeftButtonDownHandler(object sender, MouseEventArgs e);
+        public delegate void MouseLeftButtonUpHandler(object sender, MouseEventArgs e);
+        public new event MouseLeftButtonDownHandler MouseLeftButtonDown;
+        public new event MouseLeftButtonUpHandler MouseLeftButtonUp;
 
         public NodeOutputControl()
         {
             InitializeComponent();
         }
 
-        public NodeOutputControl(NodeOutput nodeOutput)
+        public NodeOutputControl(NodeIO nodeIO)
         {
             InitializeComponent();
 
-            Label = nodeOutput.label;
+            Label = nodeIO.label;
             textLabel.Text = Label;
 
-            NodeOutputCategory = nodeOutput.category;
+            NodeIOCategory = nodeIO.category;
 
-            switch (NodeOutputCategory)
+            switch (NodeIOCategory)
             {
-                case NodeOutput.NodeOutputCategory.Undefined:
+                case NodeIO.NodeIOCategory.Undefined:
                     ellipseOut.Fill = new LinearGradientBrush(Color.FromRgb(185, 185, 185), Color.FromRgb(64, 64, 64), 90);
                     break;
-                case NodeOutput.NodeOutputCategory.Image:
+                case NodeIO.NodeIOCategory.Image:
                     ellipseOut.Fill = new LinearGradientBrush(Color.FromRgb(255, 235, 40), Color.FromRgb(100, 90, 0), 90);
                     break;
-                case NodeOutput.NodeOutputCategory.Number:
+                case NodeIO.NodeIOCategory.Number:
                     ellipseOut.Fill = new LinearGradientBrush(Color.FromRgb(255, 255, 255), Color.FromRgb(90, 90, 90), 90);
                     break;
                 default:
                     break;
             }
+        }
+
+        private void ellipseOut_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (MouseLeftButtonDown != null)
+                MouseLeftButtonDown(sender, e);
+        }
+
+        private void ellipseOut_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (MouseLeftButtonUp != null)
+                MouseLeftButtonUp(sender, e);
         }
     }
 }

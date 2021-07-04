@@ -55,6 +55,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\NodeIO.cs" />
     <Compile Include="Resources\Controls\NodeControl.xaml.cs">
       <DependentUpon>NodeControl.xaml</DependentUpon>
     </Compile>
@@ -73,8 +74,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Classes\Node.cs" />
-    <Compile Include="Classes\NodeOutput.cs" />
-    <Compile Include="Classes\NodeInput.cs" />
     <Compile Include="Classes\NodeProperty.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

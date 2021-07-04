@@ -6,24 +6,32 @@ using System.Threading.Tasks;
 
 namespace Nodex.Classes
 {
-    public class NodeInput
+    public class NodeIO
     {
-        public NodeInputCategory category { get; }
+        public NodeIOCategory category { get; }
+        public NodeIOType type { get; }
         public string label { get; }
         public bool optional { get; }
 
-        public enum NodeInputCategory
-        {
+        public enum NodeIOCategory
+        { 
             Undefined = 0,
             Image = 1,
             Number = 2
         }
 
-        public NodeInput(NodeInputCategory category, string label, bool optional = true)
+        public enum NodeIOType
+        {
+            Input = 0,
+            Output = 1
+        }
+
+        public NodeIO(NodeIOCategory category, string label, NodeIOType type)
         {
             this.category = category;
             this.label = label;
             this.optional = optional;
+            this.type = type;
         }
     }
 }

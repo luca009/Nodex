@@ -23,6 +23,10 @@ namespace Nodex.Resources.Controls
     {
         public Node.NodeCategory NodeCategory { get; set; }
         public string Label { get; set; }
+        public delegate void NodeMouseLeftButtonDownHandler(object sender, MouseEventArgs e);
+        public delegate void NodeMouseLeftButtonUpHandler(object sender, MouseEventArgs e);
+        public event NodeMouseLeftButtonDownHandler NodeMouseLeftButtonDown;
+        public event NodeMouseLeftButtonUpHandler NodeMouseLeftButtonUp;
         bool mouseDown = false;
         Point dragOffset;
 
@@ -53,11 +57,11 @@ namespace Nodex.Resources.Controls
                     break;
             }
 
-            foreach (NodeInput nodeInput in node.inputs)
+            foreach (NodeIO nodeInput in node.inputs)
             {
                 stackpanelInputs.Children.Add(new NodeInputControl(nodeInput));
             }
-            foreach (NodeOutput nodeOutput in node.outputs)
+            foreach (NodeIO nodeOutput in node.outputs)
             {
                 stackpanelOutputs.Children.Add(new NodeOutputControl(nodeOutput));
             }
