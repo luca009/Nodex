@@ -7,7 +7,7 @@ using System.Windows;
 
 namespace Nodex.Classes
 {
-    class NodeProperty
+    public class NodeProperty
     {
         public UIElement propertyElement { get; }
         public string label { get; }

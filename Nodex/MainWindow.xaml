@@ -3,10 +3,32 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:uc="clr-namespace:Nodex.Resources.Controls"
         xmlns:local="clr-namespace:Nodex"
         mc:Ignorable="d"
         Title="MainWindow" Height="502" Width="844">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200*" MinWidth="100"/>
+            <ColumnDefinition Width="4" MaxWidth="4"/>
+            <ColumnDefinition Width="200"/>
+        </Grid.ColumnDefinitions>
+        <GridSplitter Grid.Column="1" Margin="0" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" HorizontalAlignment="Stretch"/>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="4" MaxHeight="4" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="25" />
+            </Grid.RowDefinitions>
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <Grid x:Name="gridNodeSpace">
+                    
+                </Grid>
+            </ScrollViewer>
+            <GridSplitter Grid.Row="1" Margin="0" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" HorizontalAlignment="Stretch"/>
+            <Button Content="Button" HorizontalAlignment="Left" Margin="535,191,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
 
+        </Grid>
     </Grid>
 </Window>

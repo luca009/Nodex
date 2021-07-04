@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nodex.Classes
 {
-    class NodeInput
+    public class NodeInput
     {
         public NodeInputCategory category { get; }
         public string label { get; }

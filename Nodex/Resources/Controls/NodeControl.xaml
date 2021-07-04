@@ -1,0 +1,68 @@
+﻿<UserControl x:Class="Nodex.Resources.Controls.NodeControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Nodex.Resources.Controls"
+             DataContext="{Binding RelativeSource={RelativeSource Self}}"
+             mc:Ignorable="d" Height="395" Width="370">
+    <Grid x:Name="gridRoot">
+        <Grid.RenderTransform>
+            <TransformGroup>
+                <ScaleTransform/>
+                <SkewTransform/>
+                <RotateTransform/>
+                <TranslateTransform x:Name="LocalTranslateTransform"/>
+            </TransformGroup>
+        </Grid.RenderTransform>
+        <Grid.Effect>
+            <DropShadowEffect ShadowDepth="0" Direction="0"/>
+        </Grid.Effect>
+        <Border Padding="7">
+            <Grid x:Name="gridContent" MouseMove="gridContent_MouseMove" MouseRightButtonDown="gridContent_MouseRightButtonDown" MouseRightButtonUp="gridContent_MouseRightButtonUp">
+                <Grid.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FF252525" Offset="1"/>
+                        <GradientStop Color="#FF535353"/>
+                    </LinearGradientBrush>
+                </Grid.Background>
+                <DockPanel LastChildFill="False" Margin="0">
+                    <Canvas x:Name="canvasLabel" VerticalAlignment="Top" DockPanel.Dock="Top" Height="28">
+                        <Canvas.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FF2D3CBE" Offset="0.004"/>
+                                <GradientStop Color="#FF001EA0" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Canvas.Background>
+                        <TextBlock x:Name="textLabel" Canvas.Left="2" TextWrapping="Wrap" Canvas.Top="2" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="18" Text="{Binding Label}">
+                            <TextBlock.Effect>
+                                <DropShadowEffect Direction="0" ShadowDepth="0" Color="White" BlurRadius="4"/>
+                            </TextBlock.Effect>
+                        </TextBlock>
+                    </Canvas>
+
+                    <Border Padding="0,2,1,2" Margin="-7,0,0,0">
+                        <StackPanel x:Name="stackpanelInputs">
+                            <StackPanel.Resources>
+                                <Style TargetType="{x:Type local:NodeInputControl}">
+                                    <Setter Property="Margin" Value="2"/>
+                                </Style>
+                            </StackPanel.Resources>
+
+                        </StackPanel>
+                    </Border>
+                    <Border Padding="1,2,0,2" Margin="0,0,-7,0" DockPanel.Dock="Right">
+                        <StackPanel x:Name="stackpanelOutputs">
+                            <StackPanel.Resources>
+                                <Style TargetType="{x:Type local:NodeOutputControl}">
+                                    <Setter Property="Margin" Value="2"/>
+                                </Style>
+                            </StackPanel.Resources>
+
+                        </StackPanel>
+                    </Border>
+                </DockPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

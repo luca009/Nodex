@@ -7,7 +7,7 @@ using Nodex.Classes;
 
 namespace Nodex.Classes
 {
-    class Node
+    public class Node
     {
         public NodeCategory category { get; }
         public string label { get; }
