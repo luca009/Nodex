@@ -25,8 +25,11 @@ namespace Nodex.Resources.Controls
         public string Label { get; set; }
         public delegate void NodeMouseLeftButtonDownHandler(object sender, MouseEventArgs e);
         public delegate void NodeMouseLeftButtonUpHandler(object sender, MouseEventArgs e);
+        public delegate void NodeDropHandler(object sender, DragEventArgs e);
         public event NodeMouseLeftButtonDownHandler NodeMouseLeftButtonDown;
         public event NodeMouseLeftButtonUpHandler NodeMouseLeftButtonUp;
+        public event NodeDropHandler NodeDrop;
+        public Node node { get; }
         bool mouseDown = false;
         Point dragOffset;
 
@@ -40,6 +43,7 @@ namespace Nodex.Resources.Controls
 
             Label = node.label;
             textLabel.Text = Label;
+            this.node = node;
 
             NodeCategory = node.category;
             switch (NodeCategory)
@@ -59,12 +63,36 @@ namespace Nodex.Resources.Controls
 
             foreach (NodeIO nodeInput in node.inputs)
             {
-                stackpanelInputs.Children.Add(new NodeInputControl(nodeInput));
+                NodeInputControl nodeInputControl = new NodeInputControl(nodeInput);
+                nodeInputControl.MouseLeftButtonDown += nodeIOControl_MouseLeftButtonDown;
+                nodeInputControl.MouseLeftButtonUp += nodeIOControl_MouseLeftButtonUp;
+                stackpanelInputs.Children.Add(nodeInputControl);
             }
             foreach (NodeIO nodeOutput in node.outputs)
             {
+                NodeOutputControl nodeOutputControl = new NodeOutputControl(nodeOutput);
+                nodeOutputControl.MouseLeftButtonDown += nodeIOControl_MouseLeftButtonDown;
+                nodeOutputControl.MouseLeftButtonUp += nodeIOControl_MouseLeftButtonUp;
                 stackpanelOutputs.Children.Add(new NodeOutputControl(nodeOutput));
             }
+        }
+
+        private void nodeIOControl_MouseLeftButtonDown(object sender, MouseEventArgs e)
+        {
+            if (NodeMouseLeftButtonDown != null)
+                NodeMouseLeftButtonDown(sender, e);
+        }
+
+        private void nodeIOControl_MouseLeftButtonUp(object sender, MouseEventArgs e)
+        {
+            if (NodeMouseLeftButtonUp != null)
+                NodeMouseLeftButtonUp(sender, e);
+        }
+
+        private void nodeIOControl_Drop(object sender, DragEventArgs e)
+        {
+            if (NodeDrop != null)
+                NodeDrop(sender, e);
         }
 
         private void MoveUserControl(MouseEventArgs e)
@@ -80,6 +108,17 @@ namespace Nodex.Resources.Controls
         {
             if (mouseDown)
                 MoveUserControl(e);
+            foreach (NodeOutputControl nodeOutputControl in stackpanelOutputs.Children)
+            {
+                foreach (NodeInputControl nodeInputControl in nodeOutputControl.connectedNodeInputs)
+                {
+                    nodeInputControl.connectedLine.RecalculateConnection(nodeOutputControl, nodeInputControl);
+                }
+            }
+            foreach (NodeInputControl nodeInputControl in stackpanelInputs.Children)
+            {
+                nodeInputControl.connectedLine.RecalculateConnection(nodeInputControl.connectedNodeOutput, nodeInputControl);
+            }
         }
 
         private void gridContent_MouseRightButtonDown(object sender, MouseButtonEventArgs e)

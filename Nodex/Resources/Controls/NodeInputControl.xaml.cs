@@ -25,8 +25,15 @@ namespace Nodex.Resources.Controls
         public string Label { get; set; }
         public delegate void MouseLeftButtonDownHandler(object sender, MouseEventArgs e);
         public delegate void MouseLeftButtonUpHandler(object sender, MouseEventArgs e);
+        public delegate void DropHandler(object sender, DragEventArgs e);
         public new event MouseLeftButtonDownHandler MouseLeftButtonDown;
         public new event MouseLeftButtonUpHandler MouseLeftButtonUp;
+        public new event DropHandler Drop;
+        public bool isConnected { get; private set; }
+        public NodeOutputControl connectedNodeOutput { get; set; }
+        public Line connectedLine { get; set; }
+        public int connectedLineIndexInCanvas { get; set; }
+        public Canvas parentCanvas { get; set; }
 
         public NodeInputControl()
         {
@@ -68,6 +75,14 @@ namespace Nodex.Resources.Controls
         {
             if (MouseLeftButtonUp != null)
                 MouseLeftButtonUp(sender, e);
+        }
+
+        private void ellipseIn_Drop(object sender, DragEventArgs e)
+        {
+            if (Drop != null)
+                Drop(sender, e);
+            if (e.Source != null)
+                isConnected = true;
         }
     }
 }

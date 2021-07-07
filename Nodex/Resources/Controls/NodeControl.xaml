@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Nodex.Resources.Controls"
              DataContext="{Binding RelativeSource={RelativeSource Self}}"
              mc:Ignorable="d" Height="395" Width="370">
-    <Grid x:Name="gridRoot">
+    <Grid x:Name="gridRoot" Opacity="0.8">
         <Grid.RenderTransform>
             <TransformGroup>
                 <ScaleTransform/>

@@ -22,9 +22,9 @@
                 <RowDefinition Height="25" />
             </Grid.RowDefinitions>
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                <Grid x:Name="gridNodeSpace">
+                <Canvas x:Name="canvasNodeSpace" LayoutUpdated="canvasNodeSpace_LayoutUpdated">
                     
-                </Grid>
+                </Canvas>
             </ScrollViewer>
             <GridSplitter Grid.Row="1" Margin="0" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" HorizontalAlignment="Stretch"/>
             <Button Content="Button" HorizontalAlignment="Left" Margin="535,191,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
