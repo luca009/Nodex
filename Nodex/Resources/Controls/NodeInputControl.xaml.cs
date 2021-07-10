@@ -23,23 +23,31 @@ namespace Nodex.Resources.Controls
     {
         public NodeIO.NodeIOCategory NodeIOCategory { get; set; }
         public string Label { get; set; }
+        public bool isConnected { get; private set; }
+        public NodeOutputControl connectedNodeOutput { get; set; }
+        public Line connectedLine { get; set; }
+        public int connectedLineIndexInCanvas { get; set; }
+        public Canvas parentCanvas { get; set; }
+        public NodeIO nodeIO { get; private set; }
         public delegate void MouseLeftButtonDownHandler(object sender, MouseEventArgs e);
         public delegate void MouseLeftButtonUpHandler(object sender, MouseEventArgs e);
         public delegate void DropHandler(object sender, DragEventArgs e);
         public new event MouseLeftButtonDownHandler MouseLeftButtonDown;
         public new event MouseLeftButtonUpHandler MouseLeftButtonUp;
         public new event DropHandler Drop;
-        public bool isConnected { get; private set; }
-        public NodeOutputControl connectedNodeOutput { get; set; }
-        public Line connectedLine { get; set; }
-        public int connectedLineIndexInCanvas { get; set; }
-        public Canvas parentCanvas { get; set; }
 
+        /// <summary>
+        /// This constructor is purely for the designer and should not be used as it renders the control useless.
+        /// </summary>
         public NodeInputControl()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Creates a new NodeInputControl (visual element that can take a value as input and be connected to a single NodeOutputControl).
+        /// </summary>
+        /// <param name="nodeIO">The nodeIO to base the control off of.</param>
         public NodeInputControl(NodeIO nodeIO)
         {
             InitializeComponent();
@@ -48,6 +56,7 @@ namespace Nodex.Resources.Controls
             textLabel.Text = Label;
 
             NodeIOCategory = nodeIO.category;
+            this.nodeIO = nodeIO;
 
             switch (NodeIOCategory)
             {

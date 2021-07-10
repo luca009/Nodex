@@ -12,6 +12,8 @@ namespace Nodex.Classes
         public NodeIOType type { get; }
         public string label { get; }
         public bool optional { get; }
+        public NodeIO connectedNodeIO { get; set; }
+        public object value { get; set; }
 
         public enum NodeIOCategory
         { 

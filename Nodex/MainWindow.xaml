@@ -19,16 +19,31 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="4" MaxHeight="4" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="25" />
             </Grid.RowDefinitions>
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                <Canvas x:Name="canvasNodeSpace" LayoutUpdated="canvasNodeSpace_LayoutUpdated">
-                    
+                <Canvas x:Name="canvasNodeSpace" LayoutUpdated="canvasNodeSpace_LayoutUpdated" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
+
                 </Canvas>
             </ScrollViewer>
             <GridSplitter Grid.Row="1" Margin="0" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" HorizontalAlignment="Stretch"/>
-            <Button Content="Button" HorizontalAlignment="Left" Margin="535,191,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
+            <Button Content="Button" HorizontalAlignment="Left" Margin="490,204,0,0" VerticalAlignment="Top" Width="40" Click="Button_Click"/>
+            <TabControl Grid.Row="2" TabStripPlacement="Bottom">
+                <TabItem Header="Configure">
+                    <StackPanel x:Name="stackpanelConfigureElements">
+                        <StackPanel.Resources>
+                            <Style TargetType="{x:Type Grid}">
+                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                <Setter Property="Margin" Value="2"/>
+                            </Style>
+                        </StackPanel.Resources>
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="Miscellaneous">
 
+                </TabItem>
+            </TabControl>
+            <Button x:Name="Out" Content="Out" HorizontalAlignment="Left" Margin="533,204,0,0" VerticalAlignment="Top" Width="40" Click="Out_Click"/>
         </Grid>
+        <Image x:Name="imagePreview" Grid.Column="2" Stretch="Fill" />
     </Grid>
 </Window>
