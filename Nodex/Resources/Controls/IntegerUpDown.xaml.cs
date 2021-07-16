@@ -61,13 +61,23 @@ namespace Nodex.Resources.Controls
 
         private void tboxInput_TextChanged(object sender, TextChangedEventArgs e)
         {
+            if (tboxInput.Text == "")
+                tboxInput.Text = MinValue.ToString();
+
             Regex regexObj = new Regex(@"[^\d]");
             tboxInput.Text = regexObj.Replace(tboxInput.Text, "");
             long parsedNumber = long.Parse(tboxInput.Text);
+
             if (parsedNumber > MaxValue)
+            {
                 Value = MaxValue;
+                tboxInput.Text = Value.ToString();
+            }
             else if (parsedNumber < MinValue)
+            {
                 Value = MinValue;
+                tboxInput.Text = Value.ToString();
+            }
             else
                 Value = int.Parse(tboxInput.Text);
         }
