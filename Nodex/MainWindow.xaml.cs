@@ -29,18 +29,21 @@ namespace Nodex
     public partial class MainWindow : Window
     {
         NodeControl selectedNode;
-        Node outputNode;
+        public OutputNode outputNode { get; private set; }
+        public Node[] lastNodes { get; private set; }
 
         public MainWindow()
         {
             InitializeComponent();
 
+            OutputNode outputNode = new OutputNode();
+            NodeControl nodeControl = outputNode.nodeControl;
+            CreateNodeAndAdd(nodeControl);
+            this.outputNode = outputNode;
+
             App.Current.Properties.Add("imageWidth", 512);
             App.Current.Properties.Add("imageHeight", 512);
-            
-            NodeControl nodeControl = new OutputNode().nodeControl;
-            CreateNodeAndAdd(nodeControl);
-            outputNode = nodeControl.node;
+            App.Current.Properties.Add("outputNode", outputNode);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -55,6 +58,11 @@ namespace Nodex
             //    { Width = 200, Height = 200, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top };
 
             CreateNodeAndAdd(new SolidColorNode().nodeControl);
+        }
+
+        private void bTest_Click(object sender, RoutedEventArgs e)
+        {
+            CreateNodeAndAdd(new TestNode().nodeControl);
         }
 
         private void CreateNodeAndAdd(NodeControl nodeControl)
@@ -199,6 +207,7 @@ namespace Nodex
             if (nodeInputControl.connectedLine != null)
             {
                 nodeInputControl.connectedNodeOutput.connectedLines.Remove(nodeInputControl.connectedLine);
+                nodeOutputControl.nodeIO.connectedNodeIOs.Remove(nodeInputControl.nodeIO);
                 nodeInputControl.connectedNodeOutput.connectedNodeInputs.Remove(nodeInputControl);
                 canvasNodeSpace.Children.Remove(nodeInputControl.connectedLine);
                 nodeInputControl.connectedNodeOutput = null;
@@ -206,13 +215,17 @@ namespace Nodex
             }
 
             nodeInputControl.connectedNodeOutput = nodeOutputControl;
+            nodeInputControl.nodeIO.connectedNodeIOs = new List<NodeIO> { nodeOutputControl.nodeIO };
             nodeInputControl.connectedLine = line;
             nodeOutputControl.connectedNodeInputs.Add(nodeInputControl);
+            if (nodeOutputControl.nodeIO.connectedNodeIOs == null)
+                nodeOutputControl.nodeIO.connectedNodeIOs = new List<NodeIO>();
+            nodeOutputControl.nodeIO.connectedNodeIOs.Add(nodeInputControl.nodeIO);
             nodeOutputControl.connectedLines.Add(line);
 
             nodeInputControl.connectedLineIndexInCanvas = canvasNodeSpace.Children.Add(line);
 
-            NetworkSolver.Solve(GetNodes(), imagePreview);
+            NetworkSolver.Solve(GetNodes());
 
             e.Handled = true;
         }
@@ -220,15 +233,18 @@ namespace Nodex
         private Node[] GetNodes()
         {
             List<Node> nodes = new List<Node>();
-            foreach (Control control in canvasNodeSpace.Children)
+            foreach (object obj in canvasNodeSpace.Children)
             {
-                if (control.GetType() != typeof(NodeControl))
+                if (obj.GetType() != typeof(NodeControl))
                     continue;
-                nodes.Add(((NodeControl)control).node);
+                nodes.Add(((NodeControl)obj).node);
             }
             if (nodes.Count <= 0)
                 return null;
-            return nodes.ToArray();
+
+            Node[] nodesArray = nodes.ToArray();
+            lastNodes = nodesArray;
+            return nodesArray;
         }
 
         public Node GetOutputNode()
@@ -286,6 +302,7 @@ namespace Nodex
                 //    ((NodeInputControl)((Grid)element.Parent).Parent).connectedNodeOutput = null;
                 //}
 
+                scrollviewerNodeSpace.AllowDrop = true;
                 DragDrop.DoDragDrop(sender as UIElement, ((Grid)element.Parent).Parent as NodeInputControl, DragDropEffects.Link);
             }
             else
@@ -347,6 +364,29 @@ namespace Nodex
                     foreach (NodeInputControl nodeInputControl in ((NodeControl)obj).stackpanelInputs.Children)
                         nodeInputControl.connectedLine.RecalculateConnection(nodeInputControl.connectedNodeOutput, nodeInputControl);
             }*/
+        }
+
+        private void scrollviewerNodeSpace_Drop(object sender, DragEventArgs e)
+        {
+            FrameworkElement element = sender as FrameworkElement;
+            if (null == element)
+                return;
+            IDataObject data = e.Data;
+
+            if (data.GetDataPresent(typeof(NodeInputControl)))
+            {
+                NodeInputControl nodeInputControl = (NodeInputControl)data.GetData(typeof(NodeInputControl));
+                nodeInputControl.connectedNodeOutput.connectedLines.Remove(nodeInputControl.connectedLine);
+                nodeInputControl.nodeIO.connectedNodeIOs[0].connectedNodeIOs.Remove(nodeInputControl.nodeIO);
+                nodeInputControl.nodeIO.connectedNodeIOs.Clear();
+                nodeInputControl.connectedNodeOutput.connectedNodeInputs.Remove(nodeInputControl);
+                canvasNodeSpace.Children.Remove(nodeInputControl.connectedLine);
+                nodeInputControl.connectedNodeOutput = null;
+                nodeInputControl.connectedLine = null;
+            }
+            scrollviewerNodeSpace.AllowDrop = false;
+
+            NetworkSolver.Solve(GetNodes());
         }
     }
 }

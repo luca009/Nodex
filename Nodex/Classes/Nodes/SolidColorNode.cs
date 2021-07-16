@@ -25,7 +25,7 @@ namespace Nodex.Classes.Nodes
                 "Solid Color",
                 new NodeIO[0],
                 new NodeIO[] { new NodeIO(NodeIO.NodeIOCategory.Image, "Image", NodeIO.NodeIOType.Output) },
-                new NodeProperty[] { new NodeProperty(new IntegerUpDown(255, 255, 0, 3) { Height = 24 }, "R"), new NodeProperty(new IntegerUpDown(255, 255, 0, 3) { Height = 24 }, "G"), new NodeProperty(new IntegerUpDown(255, 255, 0, 3) { Height = 24 }, "B") },
+                new NodeProperty[] { new NodeProperty(new IntegerUpDown(0, 255, 0, 3) { Height = 24 }, "R"), new NodeProperty(new IntegerUpDown(0, 255, 0, 3) { Height = 24 }, "G"), new NodeProperty(new IntegerUpDown(0, 255, 0, 3) { Height = 24 }, "B") },
                 node.Calculate
                 ), this.GetType())
             { Width = 120, Height = 70 };

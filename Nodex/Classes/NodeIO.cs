@@ -12,7 +12,7 @@ namespace Nodex.Classes
         public NodeIOType type { get; }
         public string label { get; }
         public bool optional { get; }
-        public NodeIO connectedNodeIO { get; set; }
+        public List<NodeIO> connectedNodeIOs { get; set; }
         public object value { get; set; }
 
         public enum NodeIOCategory
@@ -28,7 +28,7 @@ namespace Nodex.Classes
             Output = 1
         }
 
-        public NodeIO(NodeIOCategory category, string label, NodeIOType type)
+        public NodeIO(NodeIOCategory category, string label, NodeIOType type, bool optional = false)
         {
             this.category = category;
             this.label = label;

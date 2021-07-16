@@ -36,12 +36,29 @@ namespace Nodex.Classes
 
         public void PopulateOutputs()
         {
+            foreach (NodeIO input in inputs)
+            {
+                //Check if all non-optional inputs are connected, if not, output 0
+                if ((input.connectedNodeIOs == null || input.connectedNodeIOs.Count <= 0) && !input.optional)
+                {
+                    foreach (NodeIO output in outputs)
+                    {
+                        output.value = 0;
+                    }
+                    return;
+                }
+            }
+
             object[] objects = calculateOutputs(inputs, properties);
+
             for (int i = 0; i < objects.Length; i++)
             {
                 if (i > outputs.Length - 1)
                     throw new ArgumentException("Too many objects were returned.");
                 outputs[i].value = objects[i];
+
+                foreach (NodeIO nodeIO in outputs[i].connectedNodeIOs)
+                    nodeIO.value = objects[i];
             }
         }
     }

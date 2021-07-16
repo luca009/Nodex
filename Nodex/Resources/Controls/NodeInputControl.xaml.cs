@@ -29,6 +29,7 @@ namespace Nodex.Resources.Controls
         public int connectedLineIndexInCanvas { get; set; }
         public Canvas parentCanvas { get; set; }
         public NodeIO nodeIO { get; private set; }
+        public NodeControl parentNodeControl { get; private set; }
         public delegate void MouseLeftButtonDownHandler(object sender, MouseEventArgs e);
         public delegate void MouseLeftButtonUpHandler(object sender, MouseEventArgs e);
         public delegate void DropHandler(object sender, DragEventArgs e);
@@ -58,6 +59,8 @@ namespace Nodex.Resources.Controls
             NodeIOCategory = nodeIO.category;
             this.nodeIO = nodeIO;
 
+            parentNodeControl = null;
+
             switch (NodeIOCategory)
             {
                 case NodeIO.NodeIOCategory.Undefined:
@@ -72,6 +75,16 @@ namespace Nodex.Resources.Controls
                 default:
                     break;
             }
+        }
+
+        public void RefreshNodeControl()
+        {
+            FrameworkElement currentElement = (FrameworkElement)this;
+            do
+            {
+                currentElement = currentElement.Parent as FrameworkElement;
+            } while (currentElement.GetType() != typeof(NodeControl));
+            parentNodeControl = (NodeControl)currentElement;
         }
 
         private void ellipseIn_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

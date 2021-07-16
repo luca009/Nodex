@@ -33,6 +33,10 @@ namespace Nodex.Resources.Controls
         public event NodeDropHandler NodeDrop;
         public Node node { get; }
         public Type nodeType { get; }
+        public List<NodeInputControl> inputs { get; }
+        public List<NodeOutputControl> outputs { get; }
+        public int index { get; set; }
+        public bool invalidConnections { get; set; }
         bool mouseDown = false;
         Point dragOffset;
 
@@ -69,6 +73,9 @@ namespace Nodex.Resources.Controls
                     break;
             }
 
+            inputs = new List<NodeInputControl>();
+            outputs = new List<NodeOutputControl>();
+
             if (node.inputs != null)
                 foreach (NodeIO nodeInput in node.inputs)
                 {
@@ -76,6 +83,8 @@ namespace Nodex.Resources.Controls
                     nodeInputControl.MouseLeftButtonDown += nodeIOControl_MouseLeftButtonDown;
                     nodeInputControl.MouseLeftButtonUp += nodeIOControl_MouseLeftButtonUp;
                     stackpanelInputs.Children.Add(nodeInputControl);
+                    inputs.Add(nodeInputControl);
+                    nodeInputControl.RefreshNodeControl();
                 }
             if (node.outputs != null)
                 foreach (NodeIO nodeOutput in node.outputs)
@@ -83,7 +92,9 @@ namespace Nodex.Resources.Controls
                     NodeOutputControl nodeOutputControl = new NodeOutputControl(nodeOutput);
                     nodeOutputControl.MouseLeftButtonDown += nodeIOControl_MouseLeftButtonDown;
                     nodeOutputControl.MouseLeftButtonUp += nodeIOControl_MouseLeftButtonUp;
-                    stackpanelOutputs.Children.Add(new NodeOutputControl(nodeOutput));
+                    stackpanelOutputs.Children.Add(nodeOutputControl);
+                    outputs.Add(nodeOutputControl);
+                    nodeOutputControl.RefreshNodeControl();
                 }
 
             if (nodeType != null)
