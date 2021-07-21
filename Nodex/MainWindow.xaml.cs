@@ -65,6 +65,11 @@ namespace Nodex
             CreateNodeAndAdd(new TestNode().nodeControl);
         }
 
+        private void bWhiteNoise_Click(object sender, RoutedEventArgs e)
+        {
+            CreateNodeAndAdd(new WhiteNoiseNode().nodeControl);
+        }
+
         private void CreateNodeAndAdd(NodeControl nodeControl)
         {
             //Add event handlers
@@ -207,7 +212,8 @@ namespace Nodex
             if (nodeInputControl.connectedLine != null)
             {
                 nodeInputControl.connectedNodeOutput.connectedLines.Remove(nodeInputControl.connectedLine);
-                nodeOutputControl.nodeIO.connectedNodeIOs.Remove(nodeInputControl.nodeIO);
+                if (nodeOutputControl.nodeIO.connectedNodeIOs != null)
+                    nodeOutputControl.nodeIO.connectedNodeIOs.Remove(nodeInputControl.nodeIO);
                 nodeInputControl.connectedNodeOutput.connectedNodeInputs.Remove(nodeInputControl);
                 canvasNodeSpace.Children.Remove(nodeInputControl.connectedLine);
                 nodeInputControl.connectedNodeOutput = null;

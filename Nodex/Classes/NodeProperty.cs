@@ -20,6 +20,7 @@ namespace Nodex.Classes
             this.propertyElement = propertyElement;
             this.label = label;
 
+            propertyElement.MouseMove += ValueUpdated;
             propertyElement.MouseDown += ValueUpdated;
             propertyElement.MouseUp += ValueUpdated;
             propertyElement.MouseWheel += ValueUpdated;

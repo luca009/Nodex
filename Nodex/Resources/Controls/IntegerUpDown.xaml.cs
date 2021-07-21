@@ -25,6 +25,8 @@ namespace Nodex.Resources.Controls
         public int MaxValue { get; set; }
         public int MinValue { get; set; }
         public short Step { get; set; }
+        public delegate void ValueChangedHandler(object sender, EventArgs e);
+        public event ValueChangedHandler ValueChanged;
 
         public IntegerUpDown()
         {
@@ -33,10 +35,10 @@ namespace Nodex.Resources.Controls
         public IntegerUpDown(int value = 0, int maxValue = 100, int minValue = 0, short step = 1)
         {
             InitializeComponent();
-            tboxInput.Text = value.ToString();
             Value = value;
             MaxValue = maxValue;
             MinValue = minValue;
+            tboxInput.Text = value.ToString();
             if (step > 0)
                 Step = step;
             else
@@ -61,25 +63,27 @@ namespace Nodex.Resources.Controls
 
         private void tboxInput_TextChanged(object sender, TextChangedEventArgs e)
         {
+            if (tboxInput.Text == Value.ToString())
+                return;
+
             if (tboxInput.Text == "")
-                tboxInput.Text = MinValue.ToString();
+                tboxInput.Text = Value.ToString();
 
             Regex regexObj = new Regex(@"[^\d]");
             tboxInput.Text = regexObj.Replace(tboxInput.Text, "");
             long parsedNumber = long.Parse(tboxInput.Text);
 
             if (parsedNumber > MaxValue)
-            {
                 Value = MaxValue;
-                tboxInput.Text = Value.ToString();
-            }
             else if (parsedNumber < MinValue)
-            {
                 Value = MinValue;
-                tboxInput.Text = Value.ToString();
-            }
             else
                 Value = int.Parse(tboxInput.Text);
+
+            tboxInput.Text = Value.ToString();
+
+            if (ValueChanged != null)
+                ValueChanged(sender, e);
         }
 
         private void tboxInput_MouseWheel(object sender, MouseWheelEventArgs e)

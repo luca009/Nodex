@@ -57,8 +57,9 @@ namespace Nodex.Classes
                     throw new ArgumentException("Too many objects were returned.");
                 outputs[i].value = objects[i];
 
-                foreach (NodeIO nodeIO in outputs[i].connectedNodeIOs)
-                    nodeIO.value = objects[i];
+                if (outputs[i].connectedNodeIOs != null)
+                    foreach (NodeIO nodeIO in outputs[i].connectedNodeIOs)
+                        nodeIO.value = objects[i];
             }
         }
     }

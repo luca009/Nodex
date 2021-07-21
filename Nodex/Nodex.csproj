@@ -62,12 +62,12 @@
     <Compile Include="Classes\BitmapSourceConversionHelper.cs" />
     <Compile Include="Classes\DynamicLine.cs" />
     <Compile Include="Classes\NetworkSolver.cs" />
-    <Compile Include="Classes\NodeHandler.cs" />
     <Compile Include="Classes\NodeIO.cs" />
     <Compile Include="Classes\Nodes\OutputNode.cs" />
     <Compile Include="Classes\Nodes\SolidColorNode.cs" />
     <Compile Include="Classes\INode.cs" />
     <Compile Include="Classes\Nodes\TestNode.cs" />
+    <Compile Include="Classes\Nodes\WhiteNoiseNode.cs" />
     <Compile Include="Resources\Controls\IntegerUpDown.xaml.cs">
       <DependentUpon>IntegerUpDown.xaml</DependentUpon>
     </Compile>

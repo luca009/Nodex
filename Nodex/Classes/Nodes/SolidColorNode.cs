@@ -1,12 +1,5 @@
 ﻿using Nodex.Resources.Controls;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 
 namespace Nodex.Classes.Nodes
 {
@@ -40,14 +33,14 @@ namespace Nodex.Classes.Nodes
             int width = (int)App.Current.Properties["imageWidth"];
             int height = (int)App.Current.Properties["imageHeight"];
 
-            Bitmap bmp = new Bitmap(width, height);
-            using (Graphics gfx = Graphics.FromImage(bmp))
+            Bitmap bitmap = new Bitmap(width, height);
+            using (Graphics gfx = Graphics.FromImage(bitmap))
             using (SolidBrush brush = new SolidBrush(Color.FromArgb(R, G, B)))
             {
                 gfx.FillRectangle(brush, 0, 0, width, height);
             }
 
-            return new object[] { bmp };
+            return new object[] { bitmap };
         }
     }
 }

@@ -31,6 +31,7 @@ namespace Nodex.Classes.Nodes
             NodeIO temp = inputs[((IntegerUpDown)properties[0].propertyElement).Value - 1];
             if (temp.value == null)
                 return new object[] { 0 };
+
             return new object[] { temp.value };
         }
     }

@@ -41,7 +41,8 @@
                 </TabItem>
             </TabControl>
             <Button x:Name="bTest" Content="Test" HorizontalAlignment="Left" Margin="533,204,0,0" VerticalAlignment="Top" Width="40" Click="bTest_Click"/>
+            <Button x:Name="bWhiteNoise" Content="Noise" HorizontalAlignment="Left" Margin="578,204,0,0" VerticalAlignment="Top" Width="40" Click="bWhiteNoise_Click"/>
         </Grid>
-        <Image x:Name="imagePreview" Grid.Column="2" Stretch="Fill" />
+        <Image x:Name="imagePreview" Grid.Column="2" />
     </Grid>
 </Window>
