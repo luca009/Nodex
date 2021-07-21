@@ -6,7 +6,7 @@
         xmlns:uc="clr-namespace:Nodex.Resources.Controls"
         xmlns:local="clr-namespace:Nodex"
         mc:Ignorable="d"
-        Title="MainWindow" Height="502" Width="844">
+        Title="Nodex" Height="500" Width="850">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200*" MinWidth="100"/>
@@ -24,7 +24,6 @@
                 <Canvas x:Name="canvasNodeSpace" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"/>
             </ScrollViewer>
             <GridSplitter Grid.Row="1" Margin="0" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" HorizontalAlignment="Stretch"/>
-            <Button Content="Color" HorizontalAlignment="Left" Margin="490,204,0,0" VerticalAlignment="Top" Width="40" Click="Button_Click"/>
             <TabControl Grid.Row="2" TabStripPlacement="Bottom">
                 <TabItem Header="Configure">
                     <StackPanel x:Name="stackpanelConfigureElements">
@@ -36,12 +35,14 @@
                         </StackPanel.Resources>
                     </StackPanel>
                 </TabItem>
-                <TabItem Header="Miscellaneous">
-
+                <TabItem Header="Add Nodes">
+                    <Grid>
+                        <Button x:Name="bSolidColor" Content="Solid Color" HorizontalAlignment="Left" Margin="9,10,0,0" VerticalAlignment="Top" Width="84" Click="bSolidColor_Click"/>
+                        <Button x:Name="bTest" Content="Test" HorizontalAlignment="Left" Margin="99,10,0,0" VerticalAlignment="Top" Width="84" Click="bTest_Click"/>
+                        <Button x:Name="bWhiteNoise" Content="White Noise" HorizontalAlignment="Left" Margin="193,10,0,0" VerticalAlignment="Top" Width="84" Click="bWhiteNoise_Click"/>
+                    </Grid>
                 </TabItem>
             </TabControl>
-            <Button x:Name="bTest" Content="Test" HorizontalAlignment="Left" Margin="533,204,0,0" VerticalAlignment="Top" Width="40" Click="bTest_Click"/>
-            <Button x:Name="bWhiteNoise" Content="Noise" HorizontalAlignment="Left" Margin="578,204,0,0" VerticalAlignment="Top" Width="40" Click="bWhiteNoise_Click"/>
         </Grid>
         <Image x:Name="imagePreview" Grid.Column="2" />
     </Grid>

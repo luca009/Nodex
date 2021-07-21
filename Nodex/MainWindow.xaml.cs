@@ -46,7 +46,7 @@ namespace Nodex
             App.Current.Properties.Add("outputNode", outputNode);
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void bSolidColor_Click(object sender, RoutedEventArgs e)
         {
             CreateNodeAndAdd(new SolidColorNode().nodeControl);
         }
