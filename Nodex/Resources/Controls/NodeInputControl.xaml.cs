@@ -26,7 +26,6 @@ namespace Nodex.Resources.Controls
         public bool isConnected { get; private set; }
         public NodeOutputControl connectedNodeOutput { get; set; }
         public Line connectedLine { get; set; }
-        public int connectedLineIndexInCanvas { get; set; }
         public Canvas parentCanvas { get; set; }
         public NodeIO nodeIO { get; private set; }
         public NodeControl parentNodeControl { get; private set; }

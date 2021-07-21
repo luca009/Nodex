@@ -48,15 +48,6 @@ namespace Nodex
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //Random tempRandom = new Random();
-            //NodeControl nodeControl = new NodeControl(new Node(Node.NodeCategory.Input,
-            //    "test",
-            //    new NodeIO[] { new NodeIO(NodeIO.NodeIOCategory.Image, "Image", NodeIO.NodeIOType.Input), new NodeIO(NodeIO.NodeIOCategory.Number, "Number", NodeIO.NodeIOType.Input) },
-            //    new NodeIO[] { new NodeIO(NodeIO.NodeIOCategory.Undefined, "Undefined", NodeIO.NodeIOType.Output) },
-            //    new NodeProperty[] { new NodeProperty(new Button(), tempRandom.Next().ToString()) },
-            //    (NodeIO[] inputs, NodeProperty[] properties) => { return null; }))
-            //    { Width = 200, Height = 200, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top };
-
             CreateNodeAndAdd(new SolidColorNode().nodeControl);
         }
 
@@ -73,8 +64,6 @@ namespace Nodex
         private void CreateNodeAndAdd(NodeControl nodeControl)
         {
             //Add event handlers
-            nodeControl.NodeMouseLeftButtonDown += nodeControl_NodeMouseLeftButtonDown;
-            nodeControl.NodeMouseLeftButtonUp += nodeControl_NodeMouseLeftButtonUp;
             nodeControl.NodeMouseRightButtonDown += nodeControl_NodeMouseRightButtonDown;
             foreach (NodeInputControl nodeInputControl in nodeControl.stackpanelInputs.Children)
             {
@@ -86,7 +75,6 @@ namespace Nodex
                 nodeOutputControl.MouseLeftButtonDown += nodeIOControl_MouseLeftButtonDown;
                 nodeOutputControl.Drop += nodeIOControl_Drop;
             }
-            nodeControl.NodeDrop += nodeControl_NodeDrop;
 
             //Add to the canvas and push it to the top
             canvasNodeSpace.Children.Add(nodeControl);
@@ -96,6 +84,7 @@ namespace Nodex
 
         private void nodeControl_NodeMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
+            //Change ZIndexes of each object depending on their type (make NodeControls on top)
             Type lineType = typeof(Line);
             Type nodeControlType = typeof(NodeControl);
             foreach (FrameworkElement item in canvasNodeSpace.Children)
@@ -129,28 +118,21 @@ namespace Nodex
         {
             Panel.SetZIndex(nodeControl, 3);
 
+            //Cleanly empty the StackPanel for node properties
             for (int i = stackpanelConfigureElements.Children.Count - 1; i >= 0; i--)
             {
-                //stackpanelConfigureElements.RemoveChild(stackpanelConfigureElements.Children[i]);
                 var temp = stackpanelConfigureElements.Children[i];
                 ((Grid)temp).Children.Clear();
                 this.RemoveLogicalChild(temp);
-                //this.RemoveVisualChild(temp);
             }
-
             stackpanelConfigureElements.Children.Clear();
+
+            //Add the new node properties to the StackPanel
             foreach (NodeProperty property in nodeControl.node.properties)
             {
                 Grid addGrid = new Grid();
                 TextBlock labelText = new TextBlock() { HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(2, 0, 5, 0), Text = property.label };
                 addGrid.Children.Add(labelText);
-
-                //string elementXaml = XamlWriter.Save(property.propertyElement);
-                //StringReader stringReader = new StringReader(elementXaml);
-                //XmlReader xmlReader = XmlReader.Create(stringReader);
-                //Control newPropertyElement = (UserControl)XamlReader.Load(xmlReader);
-
-                //newPropertyElement.HorizontalAlignment = HorizontalAlignment.Right;
 
                 Control tempControl = (Control)property.propertyElement;
                 this.RemoveLogicalChild(tempControl);
@@ -167,11 +149,10 @@ namespace Nodex
                 return;
             IDataObject data = e.Data;
 
-            //canvasNodeSpace.Children.RemoveAt(linePreviewIndex);
-
             NodeInputControl nodeInputControl;
             NodeOutputControl nodeOutputControl;
 
+            //Get the affected NodeInput-/OutputControls
             if (data.GetDataPresent(typeof(NodeInputControl)) && ((Grid)element.Parent).Parent is NodeOutputControl)
             {
                 nodeInputControl = data.GetData(typeof(NodeInputControl)) as NodeInputControl;
@@ -220,6 +201,7 @@ namespace Nodex
                 nodeInputControl.connectedLine = null;
             }
 
+            //Add the new line and node connections
             nodeInputControl.connectedNodeOutput = nodeOutputControl;
             nodeInputControl.nodeIO.connectedNodeIOs = new List<NodeIO> { nodeOutputControl.nodeIO };
             nodeInputControl.connectedLine = line;
@@ -229,13 +211,17 @@ namespace Nodex
             nodeOutputControl.nodeIO.connectedNodeIOs.Add(nodeInputControl.nodeIO);
             nodeOutputControl.connectedLines.Add(line);
 
-            nodeInputControl.connectedLineIndexInCanvas = canvasNodeSpace.Children.Add(line);
+            canvasNodeSpace.Children.Add(line);
 
+            //Solve the network
             NetworkSolver.Solve(GetNodes());
 
             e.Handled = true;
         }
 
+        /// <summary>
+        /// Get all the Nodes on the Canvas
+        /// </summary>
         private Node[] GetNodes()
         {
             List<Node> nodes = new List<Node>();
@@ -253,18 +239,6 @@ namespace Nodex
             return nodesArray;
         }
 
-        public Node GetOutputNode()
-        {
-            foreach (Control control in canvasNodeSpace.Children)
-            {
-                if (control.GetType() != typeof(NodeControl))
-                    continue;
-                if (((NodeControl)control).nodeType == typeof(OutputNode))
-                    return ((NodeControl)control).node;
-            }
-            return null;
-        }
-
         private void nodeIOControl_MouseLeftButtonDown(object sender, MouseEventArgs e)
         {
             FrameworkElement element = sender as FrameworkElement;
@@ -273,41 +247,6 @@ namespace Nodex
 
             if (((Grid)element.Parent).Parent is NodeInputControl)
             {
-                /* Attempt at making a "preview" line while dragging
-                Point mousePosition = e.GetPosition(canvasNodeSpace);
-                Line linePreview = new Line()
-                {
-                    X1 = mousePosition.X,
-                    Y1 = mousePosition.Y,
-                    X2 = mousePosition.X,
-                    Y2 = mousePosition.Y,
-                    Stroke = new SolidColorBrush(Color.FromRgb(30, 30, 30)),
-                    StrokeThickness = 1
-                };
-
-                linePreviewIndex = canvasNodeSpace.Children.Add(linePreview);
-
-                Thread thread = new Thread(() => {
-                    while (true)
-                    {
-                        Dispatcher.Invoke(() =>
-                        {
-                            Point mousePositionCurrent = e.GetPosition(canvasNodeSpace);
-                            linePreview.RecalculateConnection(new Point(linePreview.X1, linePreview.Y1), mousePositionCurrent);
-                        });
-                        Thread.Sleep(16); //Wait roughly as needed to achieve 60fps
-                    }
-                });
-                thread.SetApartmentState(ApartmentState.STA);
-                thread.Start();*/
-                //if (((NodeInputControl)((Grid)element.Parent).Parent).connectedNodeOutput != null)
-                //{
-                //    ((NodeInputControl)((Grid)element.Parent).Parent).connectedLine = null;
-                //    canvasNodeSpace.Children.RemoveAt(((NodeInputControl)((Grid)element.Parent).Parent).connectedLineIndexInCanvas);
-                //    ((NodeInputControl)((Grid)element.Parent).Parent).connectedLineIndexInCanvas = 0;
-                //    ((NodeInputControl)((Grid)element.Parent).Parent).connectedNodeOutput = null;
-                //}
-
                 scrollviewerNodeSpace.AllowDrop = true;
                 DragDrop.DoDragDrop(sender as UIElement, ((Grid)element.Parent).Parent as NodeInputControl, DragDropEffects.Link);
             }
@@ -315,65 +254,9 @@ namespace Nodex
                 DragDrop.DoDragDrop(sender as UIElement, ((Grid)element.Parent).Parent as NodeOutputControl, DragDropEffects.Link);
         }
 
-        private void nodeControl_NodeDrop(object sender, DragEventArgs e)
-        {
-            //FrameworkElement elem = sender as FrameworkElement;
-            //if (null == elem)
-            //    return;
-            //IDataObject data = e.Data;
-            //if (data.GetDataPresent(typeof(NodeInputControl)) && !(sender is NodeInputControl))
-            //{
-            //    NodeInputControl nodeInputControl = data.GetData(typeof(NodeInputControl)) as NodeInputControl;
-            //    NodeOutputControl nodeOutputControl = sender as NodeOutputControl;
-            //    Line line = new Line()
-            //    {
-            //        X1 = nodeInputControl.Margin.Left,
-            //        Y1 = nodeInputControl.Margin.Top,
-            //        X2 = nodeOutputControl.Margin.Left,
-            //        Y2 = nodeOutputControl.Margin.Top,
-            //        Stroke = new SolidColorBrush(Color.FromRgb(30, 30, 30)),
-            //        StrokeThickness = 4
-            //    };
-            //    nodeInputControl.connectedNodeOutput = nodeOutputControl;
-            //    nodeOutputControl.connectedNodeInputs.Add(nodeInputControl);
-            //}
-            //else if (data.GetDataPresent(typeof(NodeOutputControl)) && !(sender is NodeOutputControl))
-            //{
-            //    NodeOutputControl nodeOutputControl = data.GetData(typeof(NodeOutputControl)) as NodeOutputControl;
-            //}
-            //else return;
-        }
-
-        private void nodeControl_NodeMouseLeftButtonDown(object sender, MouseEventArgs e)
-        {
-            /* UIElement element = sender as UIElement;
-             if (element == null)
-                 return;
-             if (element.GetType() == typeof(NodeInputControl))
-                 DragDrop.DoDragDrop(element, new DataObject(element as NodeInputControl), DragDropEffects.Move);
-
-             //else
-             //    DragDrop.DoDragDrop(element, ((StackPanel)((Border)((Grid)((Border)((StackPanel)((NodeInputControl)((Grid)element).Parent).Parent).Parent).Parent).Children[2]).Child). as NodeOutputControl, DragDropEffects.Move);
-             NodeControl nodeControl = element as NodeControl;*/
-        }
-
-        private void nodeControl_NodeMouseLeftButtonUp(object sender, MouseEventArgs e)
-        {
-            //throw new NotImplementedException();
-        }
-
-        private void canvasNodeSpace_LayoutUpdated(object sender, EventArgs e)
-        {
-            /*foreach (object obj in canvasNodeSpace.Children)
-            {
-                if (obj.GetType() == typeof(NodeControl))
-                    foreach (NodeInputControl nodeInputControl in ((NodeControl)obj).stackpanelInputs.Children)
-                        nodeInputControl.connectedLine.RecalculateConnection(nodeInputControl.connectedNodeOutput, nodeInputControl);
-            }*/
-        }
-
         private void scrollviewerNodeSpace_Drop(object sender, DragEventArgs e)
         {
+            //If a node connection is dragged directly onto the canvas, remove it
             FrameworkElement element = sender as FrameworkElement;
             if (null == element)
                 return;

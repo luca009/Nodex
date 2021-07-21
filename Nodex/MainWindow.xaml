@@ -21,7 +21,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <ScrollViewer x:Name="scrollviewerNodeSpace" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Drop="scrollviewerNodeSpace_Drop">
-                <Canvas x:Name="canvasNodeSpace" LayoutUpdated="canvasNodeSpace_LayoutUpdated" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"/>
+                <Canvas x:Name="canvasNodeSpace" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"/>
             </ScrollViewer>
             <GridSplitter Grid.Row="1" Margin="0" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" HorizontalAlignment="Stretch"/>
             <Button Content="Color" HorizontalAlignment="Left" Margin="490,204,0,0" VerticalAlignment="Top" Width="40" Click="Button_Click"/>

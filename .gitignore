@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /calculating.pdn
+/Nodex/MainWindow.xaml.cs.bak

@@ -14,6 +14,10 @@ namespace Nodex.Classes
 {
     public static class NetworkSolver
     {
+        /// <summary>
+        /// Solves the node network and sets the output node
+        /// </summary>
+        /// <param name="nodes">Node network as array</param>
         public static void Solve(Node[] nodes)
         {
             NodeControl outputNode = ((OutputNode)App.Current.Properties["outputNode"]).nodeControl;
@@ -33,6 +37,10 @@ namespace Nodex.Classes
             CalculateOutput(indexDictionary);
         }
 
+        /// <summary>
+        /// Solves the node network without reindexing it, saving some performance, though should not be used if the node network has changed since the last solve.
+        /// </summary>
+        /// <param name="nodes">Node network as array</param>
         public static void SolveWithoutReindexing(Node[] nodes)
         {
             Dictionary<NodeControl, int> indexDictionary = new Dictionary<NodeControl, int>();
@@ -50,6 +58,9 @@ namespace Nodex.Classes
             CalculateOutput(indexDictionary);
         }
 
+        /// <summary>
+        /// Removes index of each node on a canvas
+        /// </summary>
         private static void RemoveIndexes(Canvas parentCanvas)
         {
             foreach (FrameworkElement item in parentCanvas.Children) {
@@ -60,14 +71,16 @@ namespace Nodex.Classes
             }
         }
 
+        /// <summary>
+        /// Indexes all nodes, think of this as the distance from the output node
+        /// </summary>
+        /// <returns>Dictionary containing the NodeControls and their index</returns>
         private static Dictionary<NodeControl, int> Index(NodeControl outputNode)
         {
             Dictionary<NodeControl, int> nodeControlIndexes = new Dictionary<NodeControl, int>();
 
             outputNode.index = 1;
             nodeControlIndexes.Add(outputNode, 1);
-            //outputNode.textLabel.Text = outputNode.index.ToString();
-            //handledNodeControls++;
 
             NodeControl currentNodeControl = outputNode.inputs[0].connectedNodeOutput.parentNodeControl;
             int currentIndex = 2;
@@ -101,7 +114,6 @@ namespace Nodex.Classes
 
                 if (startingIndex > startingNodeControl.index)
                     startingNodeControl.index = startingIndex;
-                //startingNodeControl.textLabel.Text = startingNodeControl.index.ToString();
             }
 
             while (startingNodeControl.inputs.Count > 0)
@@ -110,23 +122,25 @@ namespace Nodex.Classes
                 {
                     case 0: break;
                     case 1:
+                        //There's only one input, continue from there
                         if (startingNodeControl.index > 0)
                             nodeControlIndexes.Remove(startingNodeControl);
                         if (startingIndex > startingNodeControl.index)
                             startingNodeControl.index = startingIndex;
 
                         nodeControlIndexes.Add(startingNodeControl, startingIndex);
-                        //startingNodeControl.textLabel.Text = startingNodeControl.index.ToString();
 
                         startingNodeControl = startingNodeControl.inputs[0].parentNodeControl;
                         break;
                     case int n when n > 1:
+                        //There are multiple inputs, recursively continue from each one
                         bool alreadyAdded = false;
                         if (startingNodeControl.index > 0)
                         {
                             nodeControlIndexes.Remove(startingNodeControl);
                             alreadyAdded = true;
                         }
+                        //Super janky way to detect nodes connected to themselves
                         if (startingIndex >= 2800)
                         {
                             startingNodeControl.invalidConnections = true;
@@ -136,7 +150,6 @@ namespace Nodex.Classes
                             startingNodeControl.index = startingIndex;
 
                         nodeControlIndexes.Add(startingNodeControl, startingIndex);
-                        //startingNodeControl.textLabel.Text = startingNodeControl.index.ToString();
 
                         int nulls = 0;
                         for (int i = 0; i < startingNodeControl.inputs.Count; i++)
@@ -169,6 +182,10 @@ namespace Nodex.Classes
             return nodeControlIndexes;
         }
 
+        /// <summary>
+        /// Loops through all nodes, populating all relevant outputs
+        /// </summary>
+        /// <param name="inputDictionary">Dictionary containing all NodeControls and their indexes</param>
         private static void CalculateOutput(Dictionary<NodeControl, int> inputDictionary)
         {
             var tempList = inputDictionary.ToList();
@@ -180,15 +197,6 @@ namespace Nodex.Classes
                 NodeControl nodeControl = keyValuePair.Key;
                 nodeControl.node.PopulateOutputs();
             }
-        }
-
-        private static int GetAmountOfNodeControlsInCanvas(Canvas canvas)
-        {
-            int count = 0;
-            foreach (FrameworkElement item in canvas.Children)
-                if (item.GetType() == typeof(NodeControl))
-                    count++;
-            return count;
         }
     }
 }
