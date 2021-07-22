@@ -51,6 +51,8 @@ namespace Nodex.Resources.Controls
             if (Value > MaxValue)
                 Value = MaxValue;
             tboxInput.Text = Value.ToString();
+            if (ValueChanged != null)
+                ValueChanged(sender, e);
         }
 
         private void bDown_Click(object sender, RoutedEventArgs e)
@@ -59,6 +61,8 @@ namespace Nodex.Resources.Controls
             if (Value < MinValue)
                 Value = MinValue;
             tboxInput.Text = Value.ToString();
+            if (ValueChanged != null)
+                ValueChanged(sender, e);
         }
 
         private void tboxInput_TextChanged(object sender, TextChangedEventArgs e)

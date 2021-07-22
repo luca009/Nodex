@@ -20,6 +20,7 @@ using System.Windows.Markup;
 using System.IO;
 using System.Xml;
 using Nodex.Classes.Nodes;
+using System.Windows.Media.Effects;
 
 namespace Nodex
 {
@@ -31,6 +32,21 @@ namespace Nodex
         NodeControl selectedNode;
         public OutputNode outputNode { get; private set; }
         public Node[] lastNodes { get; private set; }
+
+        #region Commands
+        private ICommand deleteCommand;
+        public ICommand DeleteCommand
+        {
+            get
+            {
+                return deleteCommand
+                    ?? (deleteCommand = new ActionCommand(() =>
+                    {
+                        DeleteNode(selectedNode);
+                    }));
+            }
+        }
+        #endregion
 
         public MainWindow()
         {
@@ -82,12 +98,47 @@ namespace Nodex
             Panel.SetZIndex(nodeControl, 3);
         }
 
+        private void DeleteNode(NodeControl nodeControl)
+        {
+            if (nodeControl == null || nodeControl.nodeType == typeof(OutputNode))
+                return;
+
+            foreach (NodeInputControl nodeInputControl in nodeControl.inputs)
+            {
+                nodeInputControl.connectedNodeOutput.connectedNodeInputs = null;
+                nodeInputControl.connectedNodeOutput.nodeIO.connectedNodeIOs.Remove(nodeInputControl.nodeIO);
+                canvasNodeSpace.Children.Remove(nodeInputControl.connectedLine);
+                nodeInputControl.connectedLine = null;
+            }
+            foreach (NodeOutputControl nodeOutputControl in nodeControl.outputs)
+            {
+                foreach (NodeInputControl nodeInputControl in nodeOutputControl.connectedNodeInputs)
+                {
+                    nodeInputControl.connectedNodeOutput = null;
+                    nodeInputControl.nodeIO.connectedNodeIOs.Remove(nodeOutputControl.nodeIO);
+                    canvasNodeSpace.Children.Remove(nodeInputControl.connectedLine);
+                    nodeInputControl.connectedLine = null;
+                }
+            }
+
+            //Cleanly empty the StackPanel for node properties
+            for (int i = stackpanelConfigureElements.Children.Count - 1; i >= 0; i--)
+            {
+                var temp = stackpanelConfigureElements.Children[i];
+                ((Grid)temp).Children.Clear();
+                this.RemoveLogicalChild(temp);
+            }
+            stackpanelConfigureElements.Children.Clear();
+
+            canvasNodeSpace.Children.Remove(nodeControl);
+        }
+
         private void nodeControl_NodeMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             //Change ZIndexes of each object depending on their type (make NodeControls on top)
             Type lineType = typeof(Line);
             Type nodeControlType = typeof(NodeControl);
-            foreach (FrameworkElement item in canvasNodeSpace.Children)
+            foreach (UIElement item in canvasNodeSpace.Children)
             {
                 switch (item)
                 {
@@ -96,13 +147,17 @@ namespace Nodex
                         break;
                     case NodeControl nodeControl:
                         Panel.SetZIndex(item, 2);
+                        DropShadowEffect dropShadowEffectOfNodeControl = (DropShadowEffect)((UIElement)nodeControl.Content).Effect;
+                        dropShadowEffectOfNodeControl.Color = Color.FromRgb(0, 0, 0);
+                        dropShadowEffectOfNodeControl.BlurRadius = 5;
+                        dropShadowEffectOfNodeControl.Opacity = 100;
                         break;
                     default:
                         Panel.SetZIndex(item, 0);
                         break;
                 }
             }
-                
+
 
             //Cycle through the parents of the sender and find the related NodeControl
             FrameworkElement currentElement = (FrameworkElement)sender;
@@ -140,6 +195,13 @@ namespace Nodex
                 addGrid.Children.Add(tempControl);
                 stackpanelConfigureElements.Children.Add(addGrid);
             }
+
+            selectedNode = nodeControl;
+
+            DropShadowEffect dropShadowEffectOfNodeControl = (DropShadowEffect)((UIElement)nodeControl.Content).Effect;
+            dropShadowEffectOfNodeControl.Color = Color.FromRgb(0, 200, 240);
+            dropShadowEffectOfNodeControl.BlurRadius = 2;
+            dropShadowEffectOfNodeControl.Opacity = 40;
         }
 
         private void nodeIOControl_Drop(object sender, DragEventArgs e)
@@ -276,6 +338,28 @@ namespace Nodex
             scrollviewerNodeSpace.AllowDrop = false;
 
             NetworkSolver.Solve(GetNodes());
+        }
+
+        private void scrollviewerNodeSpace_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            //if (selectedNode == null)
+            //    return;
+
+            ////Cleanly empty the StackPanel for node properties
+            //for (int i = stackpanelConfigureElements.Children.Count - 1; i >= 0; i--)
+            //{
+            //    var temp = stackpanelConfigureElements.Children[i];
+            //    ((Grid)temp).Children.Clear();
+            //    this.RemoveLogicalChild(temp);
+            //}
+            //stackpanelConfigureElements.Children.Clear();
+
+            //DropShadowEffect dropShadowEffectOfNodeControl = (DropShadowEffect)((UIElement)selectedNode.Content).Effect;
+            //dropShadowEffectOfNodeControl.Color = Color.FromRgb(0, 200, 240);
+            //dropShadowEffectOfNodeControl.BlurRadius = 2;
+            //dropShadowEffectOfNodeControl.Opacity = 40;
+
+            //selectedNode = null;
         }
     }
 }

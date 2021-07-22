@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Nodex.Resources.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Nodex.Classes
@@ -20,7 +22,15 @@ namespace Nodex.Classes
             this.propertyElement = propertyElement;
             this.label = label;
 
-            propertyElement.MouseMove += ValueUpdated;
+            switch (propertyElement)
+            {
+                case IntegerUpDown integerUpDown:
+                    integerUpDown.ValueChanged += ValueUpdated;
+                    break;
+                default:
+                    break;
+            }
+
             propertyElement.MouseDown += ValueUpdated;
             propertyElement.MouseUp += ValueUpdated;
             propertyElement.MouseWheel += ValueUpdated;
@@ -28,6 +38,10 @@ namespace Nodex.Classes
             propertyElement.KeyUp += ValueUpdated;
         }
 
+        private void ValueUpdated(object sender, EventArgs e)
+        {
+            NetworkSolver.SolveWithoutReindexing(((MainWindow)App.Current.MainWindow).lastNodes);
+        }
         private void ValueUpdated(object sender, MouseEventArgs e)
         {
             NetworkSolver.SolveWithoutReindexing(((MainWindow)App.Current.MainWindow).lastNodes);
