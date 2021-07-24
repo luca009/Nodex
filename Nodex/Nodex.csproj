@@ -39,6 +39,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
@@ -59,15 +60,22 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\ActionCommand.cs" />
     <Compile Include="Classes\BitmapSourceConversionHelper.cs" />
     <Compile Include="Classes\DynamicLine.cs" />
+    <Compile Include="Classes\ITexture.cs" />
     <Compile Include="Classes\NetworkSolver.cs" />
     <Compile Include="Classes\NodeIO.cs" />
+    <Compile Include="Classes\Nodes\Textures\OpenSimplexNoiseNode.cs" />
     <Compile Include="Classes\Nodes\OutputNode.cs" />
-    <Compile Include="Classes\Nodes\SolidColorNode.cs" />
+    <Compile Include="Classes\Nodes\Textures\SolidColorNode.cs" />
     <Compile Include="Classes\INode.cs" />
     <Compile Include="Classes\Nodes\TestNode.cs" />
-    <Compile Include="Classes\Nodes\WhiteNoiseNode.cs" />
+    <Compile Include="Classes\Nodes\Textures\WhiteNoiseNode.cs" />
+    <Compile Include="Classes\TextureGenerators\Dimensions.cs" />
+    <Compile Include="Classes\TextureGenerators\OpenSimplexNoise.cs" />
+    <Compile Include="Classes\Threading\Chunk.cs" />
+    <Compile Include="Classes\Threading\ParallelTextureCalculator.cs" />
     <Compile Include="Resources\Controls\IntegerUpDown.xaml.cs">
       <DependentUpon>IntegerUpDown.xaml</DependentUpon>
     </Compile>
@@ -79,6 +87,9 @@
     </Compile>
     <Compile Include="Resources\Controls\NodeInputControl.xaml.cs">
       <DependentUpon>NodeInputControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Windows\InitializingNode.xaml.cs">
+      <DependentUpon>InitializingNode.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -110,7 +121,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Resources\Icons.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Resources\Styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\Windows\InitializingNode.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -140,6 +159,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Classes\Nodes\Inputs\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

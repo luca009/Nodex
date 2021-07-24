@@ -1,0 +1,15 @@
+﻿<Window x:Class="Nodex.Resources.Windows.InitializingNode"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Nodex.Resources.Windows"
+        mc:Ignorable="d"
+        Title="Initializing Node..." Height="140" Width="300" ResizeMode="NoResize">
+    <Grid>
+        <ProgressBar x:Name="pbarProgress" Height="25" Margin="10,34,10,0" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Please wait..." VerticalAlignment="Top" FontSize="14"/>
+        <TextBlock x:Name="textCalculatingChunk" HorizontalAlignment="Left" Margin="10,0,0,10" TextWrapping="Wrap" Text="Calculating Chunk ?/?" VerticalAlignment="Bottom"/>
+
+    </Grid>
+</Window>

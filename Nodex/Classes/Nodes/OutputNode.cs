@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
@@ -51,35 +52,51 @@ namespace Nodex.Classes.Nodes
 
             BitmapSource bitmapSource = null;
 
-            int width = widthIntegerUpDown.Value;
-            int height = heightIntegerUpDown.Value;
+            int width = 0;
+            int height = 0;
 
-            switch (temp)
+            App.Current.Dispatcher.Invoke(() => {
+                width = widthIntegerUpDown.Value;
+                height = heightIntegerUpDown.Value;
+            });
+
+            try
             {
-                case Bitmap bitmap:
-                    //Resize Image if neccessary
-                    if (bitmap.Width != width || bitmap.Height != height)
-                        bitmap = new Bitmap(bitmap, width, height);
+                switch (temp)
+                {
+                    case Bitmap bitmap:
+                        //Resize Image if neccessary
+                        if (bitmap.Width != width || bitmap.Height != height)
+                            bitmap = new Bitmap(bitmap, width, height);
 
-                    bitmapSource = bitmap.ConvertToBitmapSource();
-                    break;
-                case int integer:
-                    Bitmap bmp = new Bitmap(width, height);
-                    using (Graphics gfx = Graphics.FromImage(bmp))
-                    using (SolidBrush brush = new SolidBrush(System.Drawing.Color.FromArgb(integer, integer, integer)))
-                    {
-                        gfx.FillRectangle(brush, 0, 0, width, height);
-                    }
-                    bitmapSource = bmp.ConvertToBitmapSource();
-                    break;
-                case NodeIO.NodeIOCategory.Undefined:
-                    break;
+                        App.Current.Dispatcher.Invoke(() => { bitmapSource = bitmap.ConvertToBitmapSource(); });
+                        break;
+                    case int integer:
+                        Bitmap bmp = new Bitmap(width, height);
+                        using (Graphics gfx = Graphics.FromImage(bmp))
+                        using (SolidBrush brush = new SolidBrush(System.Drawing.Color.FromArgb(integer, integer, integer)))
+                        {
+                            gfx.FillRectangle(brush, 0, 0, width, height);
+                        }
+                        bitmapSource = bmp.ConvertToBitmapSource();
+                        break;
+                    case Vector3 vector:
+                        break;
+                    case NodeIO.NodeIOCategory.Undefined:
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+
             }
 
-            if (bitmapSource != null)
-                ((MainWindow)App.Current.MainWindow).imagePreview.Source = bitmapSource;
-            else
-                ((MainWindow)App.Current.MainWindow).imagePreview.Source = null;
+            App.Current.Dispatcher.Invoke(() => {
+                if (bitmapSource != null)
+                    ((MainWindow)App.Current.MainWindow).imagePreview.Source = bitmapSource;
+                else
+                    ((MainWindow)App.Current.MainWindow).imagePreview.Source = null;
+            });
 
             return new object[0];
         }

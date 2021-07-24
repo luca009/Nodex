@@ -1,7 +1,7 @@
 ﻿using Nodex.Resources.Controls;
 using System.Drawing;
 
-namespace Nodex.Classes.Nodes
+namespace Nodex.Classes.Nodes.Textures
 {
     public partial class SolidColorNode : INode
     {

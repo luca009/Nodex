@@ -20,7 +20,9 @@ using System.Windows.Markup;
 using System.IO;
 using System.Xml;
 using Nodex.Classes.Nodes;
+using Textures = Nodex.Classes.Nodes.Textures;
 using System.Windows.Media.Effects;
+using Nodex.Resources.Windows;
 
 namespace Nodex
 {
@@ -32,6 +34,7 @@ namespace Nodex
         NodeControl selectedNode;
         public OutputNode outputNode { get; private set; }
         public Node[] lastNodes { get; private set; }
+        public InitializingNode currentInitializingNode { get; private set; }
 
         #region Commands
         private ICommand deleteCommand;
@@ -56,15 +59,18 @@ namespace Nodex
             NodeControl nodeControl = outputNode.nodeControl;
             CreateNodeAndAdd(nodeControl);
             this.outputNode = outputNode;
+            currentInitializingNode = null;
 
             App.Current.Properties.Add("imageWidth", 512);
             App.Current.Properties.Add("imageHeight", 512);
             App.Current.Properties.Add("outputNode", outputNode);
+            App.Current.Properties.Add("imageCalculatingThread", null);
+            App.Current.Properties.Add("imageCalculatingThreadRunning", false);
         }
 
         private void bSolidColor_Click(object sender, RoutedEventArgs e)
         {
-            CreateNodeAndAdd(new SolidColorNode().nodeControl);
+            CreateNodeAndAdd(new Textures.SolidColorNode().nodeControl);
         }
 
         private void bTest_Click(object sender, RoutedEventArgs e)
@@ -74,7 +80,13 @@ namespace Nodex
 
         private void bWhiteNoise_Click(object sender, RoutedEventArgs e)
         {
-            CreateNodeAndAdd(new WhiteNoiseNode().nodeControl);
+            CreateNodeAndAdd(new Textures.WhiteNoiseNode().nodeControl);
+        }
+
+        private void bOpenSimplexNoise_Click(object sender, RoutedEventArgs e)
+        {
+            currentInitializingNode = new InitializingNode();
+            CreateNodeAndAdd(new Textures.OpenSimplexNoiseNode().nodeControl);
         }
 
         private void CreateNodeAndAdd(NodeControl nodeControl)
@@ -360,6 +372,12 @@ namespace Nodex
             //dropShadowEffectOfNodeControl.Opacity = 40;
 
             //selectedNode = null;
+        }
+
+        private void window_Closed(object sender, EventArgs e)
+        {
+            //Protect against threads keeping on running
+            App.Current.Shutdown();
         }
     }
 }

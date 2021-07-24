@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /calculating.pdn
 /Nodex/MainWindow.xaml.cs.bak
+/Nodex/Classes/ProgressDialogUpdater.cs

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -186,17 +187,36 @@ namespace Nodex.Classes
         /// Loops through all nodes, populating all relevant outputs
         /// </summary>
         /// <param name="inputDictionary">Dictionary containing all NodeControls and their indexes</param>
-        private static void CalculateOutput(Dictionary<NodeControl, int> inputDictionary)
+        private static async void CalculateOutput(Dictionary<NodeControl, int> inputDictionary)
         {
-            var tempList = inputDictionary.ToList();
-            tempList.Sort((pair1, pair2) => pair1.Value.CompareTo(pair2.Value));
-            tempList.Reverse();
-
-            foreach (KeyValuePair<NodeControl, int> keyValuePair in tempList)
+            if ((bool)App.Current.Properties["imageCalculatingThreadRunning"])
             {
-                NodeControl nodeControl = keyValuePair.Key;
-                nodeControl.node.PopulateOutputs();
+                ((Thread)App.Current.Properties["imageCalculatingThread"]).Abort();
+                App.Current.Properties["imageCalculatingThreadRunning"] = false;
             }
+
+            var tempList = inputDictionary.ToList();
+            //Thread thread = new Thread(() => {
+                tempList.Sort((pair1, pair2) => pair1.Value.CompareTo(pair2.Value));
+                tempList.Reverse();
+
+                foreach (KeyValuePair<NodeControl, int> keyValuePair in tempList)
+                {
+                    Node node = null;
+                    App.Current.Dispatcher.Invoke(() => { node = keyValuePair.Key.node; });
+                    node.PopulateOutputs();
+                }
+            //});
+            //App.Current.Properties["imageCalculatingThread"] = thread;
+            App.Current.Properties["imageCalculatingThreadRunning"] = true;
+            //thread.SetApartmentState(ApartmentState.STA); //Set the thread to STA
+            //thread.Start();
+            //await Task.Run(() =>
+            //{
+                //thread.Join();
+                //Thread.Sleep(2);
+                App.Current.Properties["imageCalculatingThreadRunning"] = false;
+            //});
         }
     }
 }

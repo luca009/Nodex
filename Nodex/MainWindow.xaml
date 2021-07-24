@@ -6,10 +6,17 @@
         xmlns:uc="clr-namespace:Nodex.Resources.Controls"
         xmlns:local="clr-namespace:Nodex"
         mc:Ignorable="d"
-        Title="Nodex" Height="500" Width="850">
+        Title="Nodex" Height="500" Width="850" Closed="window_Closed">
     <Window.InputBindings>
         <KeyBinding Command="{Binding DeleteCommand, ElementName=window, Mode=OneWay}" Key="Delete"/>
     </Window.InputBindings>
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Resources/Icons.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200*" MinWidth="100"/>
@@ -41,12 +48,33 @@
                 <TabItem Header="Add Nodes">
                     <Grid>
                         <Button x:Name="bSolidColor" Content="Solid Color" HorizontalAlignment="Left" Margin="9,10,0,0" VerticalAlignment="Top" Width="84" Click="bSolidColor_Click"/>
-                        <Button x:Name="bTest" Content="Test" HorizontalAlignment="Left" Margin="99,10,0,0" VerticalAlignment="Top" Width="84" Click="bTest_Click"/>
-                        <Button x:Name="bWhiteNoise" Content="White Noise" HorizontalAlignment="Left" Margin="193,10,0,0" VerticalAlignment="Top" Width="84" Click="bWhiteNoise_Click"/>
+                        <Button x:Name="bTest" Content="Test" HorizontalAlignment="Left" Margin="98,10,0,0" VerticalAlignment="Top" Width="84" Click="bTest_Click"/>
+                        <Button x:Name="bWhiteNoise" Content="White Noise" HorizontalAlignment="Left" Margin="187,10,0,0" VerticalAlignment="Top" Width="84" Click="bWhiteNoise_Click"/>
+                        <Button x:Name="bOpenSimplexNoise" Content="OpenSimplex" HorizontalAlignment="Left" Margin="276,10,0,0" VerticalAlignment="Top" Width="84" Click="bOpenSimplexNoise_Click"/>
                     </Grid>
                 </TabItem>
             </TabControl>
         </Grid>
         <Image x:Name="imagePreview" Grid.Column="2" />
+        <Grid x:Name="gridExceptions" Grid.Column="2" VerticalAlignment="Bottom" Margin="2,0,2,2" Height="30" IsHitTestVisible="False" Visibility="Hidden">
+            <Grid.Background>
+                <LinearGradientBrush EndPoint="1,0.5" StartPoint="0,0.5">
+                    <GradientStop Color="#FFB33434"/>
+                    <GradientStop Color="#FFB34C34" Offset="1"/>
+                </LinearGradientBrush>
+            </Grid.Background>
+            <ContentPresenter Content="{StaticResource iconError}" HorizontalAlignment="Left" Margin="0" Height="30" Width="30"/>
+            <WrapPanel Margin="31,1,1,1" VerticalAlignment="Center">
+                <TextBlock x:Name="textException" Foreground="White" />
+            </WrapPanel>
+            <!-- <Rectangle RadiusY="6" RadiusX="6">
+                <Rectangle.Fill>
+                    <LinearGradientBrush EndPoint="1,0.5" StartPoint="0,0.5">
+                        <GradientStop Color="#FFB33434"/>
+                        <GradientStop Color="#FFB34C34" Offset="1"/>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle> -->
+        </Grid>
     </Grid>
 </Window>

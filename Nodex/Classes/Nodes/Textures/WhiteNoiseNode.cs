@@ -2,7 +2,7 @@
 using System;
 using System.Drawing;
 
-namespace Nodex.Classes.Nodes
+namespace Nodex.Classes.Nodes.Textures
 {
     public partial class WhiteNoiseNode : INode
     {
@@ -45,20 +45,32 @@ namespace Nodex.Classes.Nodes
             scale = (Int16)((IntegerUpDown)properties[0].propertyElement).Value;
             seed = ((IntegerUpDown)properties[1].propertyElement).Value;
 
-            Bitmap tempBitmap = new Bitmap(scale, scale);
-            Random random = new Random(seed);
-            for (int x = 0; x < scale; x++)
+            Bitmap returnBitmap;
+
+            using (Bitmap tempBitmap = new Bitmap(scale, scale))
             {
-                for (int y = 0; y < scale; y++)
+                Random random = new Random(seed);
+                try
                 {
-                    int tempRandom = random.Next(0, 256);
-                    tempBitmap.SetPixel(x, y, Color.FromArgb(tempRandom, tempRandom, tempRandom));
+                    for (int x = 0; x < scale; x++)
+                    {
+                        for (int y = 0; y < scale; y++)
+                        {
+                            int tempRandom = random.Next(0, 256);
+                            tempBitmap.SetPixel(x, y, Color.FromArgb(tempRandom, tempRandom, tempRandom));
+                        }
+                    }
                 }
+                catch (Exception ex)
+                {
+                    if (ex.GetType() != typeof(ArgumentOutOfRangeException))
+                        throw;
+                }
+
+                unscaledBitmap = tempBitmap;
+                returnBitmap = new Bitmap(tempBitmap, width, height);
             }
 
-            unscaledBitmap = tempBitmap;
-
-            Bitmap returnBitmap = new Bitmap(tempBitmap, width, height);
             bitmap = returnBitmap;
 
             return new object[] { returnBitmap };

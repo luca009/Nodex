@@ -19,7 +19,8 @@ namespace Nodex.Classes
         { 
             Undefined = 0,
             Image = 1,
-            Number = 2
+            Number = 2,
+            Vector = 3
         }
 
         public enum NodeIOType
