@@ -95,8 +95,11 @@ namespace Nodex.Classes
             return nodeControlIndexes;
         }
 
-        private static Dictionary<NodeControl, int> IndexFromNodeControl(NodeControl startingNodeControl, int startingIndex, Dictionary<NodeControl, int> nodeControlIndexes = null)
+        private static Dictionary<NodeControl, int> IndexFromNodeControl(NodeControl startingNodeControl, int startingIndex, Dictionary<NodeControl, int> nodeControlIndexes = null, short continueFromIndex = -1)
         {
+            if (continueFromIndex != -1)
+                startingNodeControl = startingNodeControl.inputs[continueFromIndex].connectedNodeOutput.parentNodeControl;
+
             if (nodeControlIndexes == null)
                 nodeControlIndexes = new Dictionary<NodeControl, int>();
 
@@ -117,11 +120,19 @@ namespace Nodex.Classes
                     startingNodeControl.index = startingIndex;
             }
 
-            while (startingNodeControl.inputs.Count > 0)
+            bool continueLoop = true;
+            while (continueLoop)
             {
                 switch (startingNodeControl.inputs.Count)
                 {
-                    case 0: break;
+                    case 0:
+                        continueLoop = false;
+                        if (startingNodeControl.index > 0)
+                            nodeControlIndexes.Remove(startingNodeControl);
+                        if (startingIndex > startingNodeControl.index)
+                            startingNodeControl.index = startingIndex;
+                        nodeControlIndexes.Add(startingNodeControl, startingIndex);
+                        break;
                     case 1:
                         //There's only one input, continue from there
                         if (startingNodeControl.index > 0)
@@ -131,7 +142,9 @@ namespace Nodex.Classes
 
                         nodeControlIndexes.Add(startingNodeControl, startingIndex);
 
-                        startingNodeControl = startingNodeControl.inputs[0].parentNodeControl;
+                        if (startingNodeControl.inputs[0].connectedNodeOutput == null)
+                            return nodeControlIndexes;
+                        startingNodeControl = startingNodeControl.inputs[0].connectedNodeOutput.parentNodeControl;
                         break;
                     case int n when n > 1:
                         //There are multiple inputs, recursively continue from each one
@@ -153,7 +166,7 @@ namespace Nodex.Classes
                         nodeControlIndexes.Add(startingNodeControl, startingIndex);
 
                         int nulls = 0;
-                        for (int i = 0; i < startingNodeControl.inputs.Count; i++)
+                        for (short i = 0; i < startingNodeControl.inputs.Count; i++)
                         {
                             if (startingNodeControl.inputs[i].connectedNodeOutput == null)
                             {
@@ -163,7 +176,7 @@ namespace Nodex.Classes
                                 continue;
                             }
 
-                            var temp = IndexFromNodeControl(startingNodeControl.inputs[i].connectedNodeOutput.parentNodeControl, startingIndex + 1, nodeControlIndexes);
+                            var temp = IndexFromNodeControl(startingNodeControl, startingIndex + 1, nodeControlIndexes, i);
                             if (temp == null)
                                 return null;
                             nodeControlIndexes = temp;

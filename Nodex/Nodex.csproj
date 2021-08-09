@@ -62,10 +62,13 @@
     </ApplicationDefinition>
     <Compile Include="Classes\ActionCommand.cs" />
     <Compile Include="Classes\BitmapSourceConversionHelper.cs" />
+    <Compile Include="Classes\Debugger.cs" />
     <Compile Include="Classes\DynamicLine.cs" />
+    <Compile Include="Classes\ExtraMath.cs" />
     <Compile Include="Classes\ITexture.cs" />
     <Compile Include="Classes\NetworkSolver.cs" />
     <Compile Include="Classes\NodeIO.cs" />
+    <Compile Include="Classes\Nodes\Inputs\VectorNode.cs" />
     <Compile Include="Classes\Nodes\Textures\OpenSimplexNoiseNode.cs" />
     <Compile Include="Classes\Nodes\OutputNode.cs" />
     <Compile Include="Classes\Nodes\Textures\SolidColorNode.cs" />
@@ -87,6 +90,12 @@
     </Compile>
     <Compile Include="Resources\Controls\NodeInputControl.xaml.cs">
       <DependentUpon>NodeInputControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Controls\Vector4Control.xaml.cs">
+      <DependentUpon>Vector4Control.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Windows\DebugWindow.xaml.cs">
+      <DependentUpon>DebugWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Resources\Windows\InitializingNode.xaml.cs">
       <DependentUpon>InitializingNode.xaml</DependentUpon>
@@ -121,11 +130,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Resources\Controls\Vector4Control.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Resources\Icons.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Resources\Styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\Windows\DebugWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -160,8 +177,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Classes\Nodes\Inputs\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

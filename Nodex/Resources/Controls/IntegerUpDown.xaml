@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Nodex.Resources.Controls"
              mc:Ignorable="d" 
-             Height="22" Width="175" MinWidth="30">
+             d:DesignHeight="20" d:DesignWidth="175" Height="20" Width="175" MinWidth="30">
     <Grid>
         <TextBox x:Name="tboxInput" TextWrapping="Wrap" Text="0" Padding="0,0,16,0" TextChanged="tboxInput_TextChanged" MouseWheel="tboxInput_MouseWheel" Margin="0,0,16,0"/>
         <Grid HorizontalAlignment="Right">
@@ -13,10 +13,10 @@
                 <RowDefinition />
                 <RowDefinition />
             </Grid.RowDefinitions>
-            <Button x:Name="bUp" HorizontalAlignment="Right" Margin="0" Width="16" Click="bUp_Click" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+            <Button x:Name="bUp" HorizontalAlignment="Right" Margin="0,-1,0,0" Width="16" Click="bUp_Click" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                 <Path Data="M -1,0 1,-1 3,0" Width="10" Stretch="Fill" Stroke="Black" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"/>
             </Button>
-            <Button x:Name="bDown" HorizontalAlignment="Right" Margin="0" Width="16" Click="bDown_Click" Grid.Row="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+            <Button x:Name="bDown" HorizontalAlignment="Right" Margin="0,0,0,-1" Width="16" Click="bDown_Click" Grid.Row="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                 <Path Data="M -1,-1 1,0 3,-1" Width="10" Stretch="Fill" Stroke="Black" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"/>
             </Button>
         </Grid>

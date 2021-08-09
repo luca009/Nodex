@@ -21,6 +21,7 @@ using System.IO;
 using System.Xml;
 using Nodex.Classes.Nodes;
 using Textures = Nodex.Classes.Nodes.Textures;
+using Inputs = Nodex.Classes.Nodes.Inputs;
 using System.Windows.Media.Effects;
 using Nodex.Resources.Windows;
 
@@ -35,6 +36,7 @@ namespace Nodex
         public OutputNode outputNode { get; private set; }
         public Node[] lastNodes { get; private set; }
         public InitializingNode currentInitializingNode { get; private set; }
+        public DebugWindow debugWindow { get; private set; }
 
         #region Commands
         private ICommand deleteCommand;
@@ -61,6 +63,9 @@ namespace Nodex
             this.outputNode = outputNode;
             currentInitializingNode = null;
 
+            debugWindow = new DebugWindow();
+            //debugWindow.Show();
+
             App.Current.Properties.Add("imageWidth", 512);
             App.Current.Properties.Add("imageHeight", 512);
             App.Current.Properties.Add("outputNode", outputNode);
@@ -81,6 +86,11 @@ namespace Nodex
         private void bWhiteNoise_Click(object sender, RoutedEventArgs e)
         {
             CreateNodeAndAdd(new Textures.WhiteNoiseNode().nodeControl);
+        }
+
+        private void bVector_Click(object sender, RoutedEventArgs e)
+        {
+            CreateNodeAndAdd(new Inputs.VectorNode().nodeControl);
         }
 
         private void bOpenSimplexNoise_Click(object sender, RoutedEventArgs e)

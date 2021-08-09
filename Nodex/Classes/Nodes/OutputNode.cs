@@ -45,7 +45,12 @@ namespace Nodex.Classes.Nodes
 
         object[] INode.Calculate(NodeIO[] inputs, NodeProperty[] properties)
         {
-            object temp = inputs[0].value;
+            object temp;
+
+            if (inputs == null)
+                temp = 0;
+            else
+                temp = inputs[0].value;
 
             if (temp == null)
                 temp = 0;

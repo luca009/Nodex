@@ -51,6 +51,7 @@
                         <Button x:Name="bTest" Content="Test" HorizontalAlignment="Left" Margin="98,10,0,0" VerticalAlignment="Top" Width="84" Click="bTest_Click"/>
                         <Button x:Name="bWhiteNoise" Content="White Noise" HorizontalAlignment="Left" Margin="187,10,0,0" VerticalAlignment="Top" Width="84" Click="bWhiteNoise_Click"/>
                         <Button x:Name="bOpenSimplexNoise" Content="OpenSimplex" HorizontalAlignment="Left" Margin="276,10,0,0" VerticalAlignment="Top" Width="84" Click="bOpenSimplexNoise_Click"/>
+                        <Button x:Name="bVector" Content="Vector" HorizontalAlignment="Left" Margin="365,10,0,0" VerticalAlignment="Top" Width="84" Click="bVector_Click"/>
                     </Grid>
                 </TabItem>
             </TabControl>

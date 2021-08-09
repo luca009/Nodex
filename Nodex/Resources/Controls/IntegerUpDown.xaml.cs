@@ -21,7 +21,11 @@ namespace Nodex.Resources.Controls
     /// </summary>
     public partial class IntegerUpDown : UserControl
     {
-        public int Value { get; set; }
+        private int _value;
+        public int Value {
+            get { return _value; }
+            set { _value = value; tboxInput.Text = value.ToString(); }
+        }
         public int MaxValue { get; set; }
         public int MinValue { get; set; }
         public short Step { get; set; }
@@ -51,6 +55,7 @@ namespace Nodex.Resources.Controls
             if (Value > MaxValue)
                 Value = MaxValue;
             tboxInput.Text = Value.ToString();
+
             if (ValueChanged != null)
                 ValueChanged(sender, e);
         }
@@ -61,6 +66,7 @@ namespace Nodex.Resources.Controls
             if (Value < MinValue)
                 Value = MinValue;
             tboxInput.Text = Value.ToString();
+
             if (ValueChanged != null)
                 ValueChanged(sender, e);
         }
@@ -73,8 +79,15 @@ namespace Nodex.Resources.Controls
             if (tboxInput.Text == "")
                 tboxInput.Text = Value.ToString();
 
-            Regex regexObj = new Regex(@"[^\d]");
+            Regex regexObj = new Regex(@"[^\d-]");
             tboxInput.Text = regexObj.Replace(tboxInput.Text, "");
+            bool negative = tboxInput.Text.StartsWith("-");
+
+            tboxInput.Text.Replace("-", "");
+
+            if (negative)
+                tboxInput.Text.Insert(0, "-");
+
             long parsedNumber = long.Parse(tboxInput.Text);
 
             if (parsedNumber > MaxValue)
@@ -101,6 +114,9 @@ namespace Nodex.Resources.Controls
             else if (Value < MinValue)
                 Value = MinValue;
             tboxInput.Text = Value.ToString();
+
+            if (ValueChanged != null)
+                ValueChanged(sender, e);
         }
     }
 }

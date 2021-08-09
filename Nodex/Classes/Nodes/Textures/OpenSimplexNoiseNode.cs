@@ -16,6 +16,7 @@ namespace Nodex.Classes.Nodes.Textures
     struct OpenSimplexNoiseCache
     {
         public OpenSimplexNoise OpenSimplexNoise;
+        public ParallelTextureCalculator ParallelTextureCalculator;
         public long Seed;
         public int Scale;
         public Dimensions.Dimension Dimension;
@@ -43,7 +44,7 @@ namespace Nodex.Classes.Nodes.Textures
             nodeControl = new NodeControl(new Node(
                 Node.NodeCategory.Texture,
                 "OpenSimplex Noise",
-                new NodeIO[0],
+                new NodeIO[] { new NodeIO(NodeIO.NodeIOCategory.Vector, "Vector", NodeIO.NodeIOType.Input, true) },
                 new NodeIO[] { new NodeIO(NodeIO.NodeIOCategory.Image, "Image", NodeIO.NodeIOType.Output) },
                 new NodeProperty[] { new NodeProperty(comboBoxDimensions, "Dimensions (WIP)"), new NodeProperty(new IntegerUpDown(0, int.MaxValue) { Height = 24 }, "Seed"), new NodeProperty(new IntegerUpDown(128, 1024, 1, 4) { Height = 24 }, "Scale") },
                 node.Calculate
@@ -53,13 +54,15 @@ namespace Nodex.Classes.Nodes.Textures
             width = (int)App.Current.Properties["imageWidth"];
             height = (int)App.Current.Properties["imageHeight"];
 
-            ParallelTextureCalculator parallelTextureCalculator = new ParallelTextureCalculator(new OpenSimplexNoise(0), width * 8, height * 8, 1024, 1024, 8);
+            ParallelTextureCalculator parallelTextureCalculator = new ParallelTextureCalculator(new OpenSimplexNoise(0), width, height, 8, new Vector4(0), new Size(128, 128));
+
             noiseCache = new OpenSimplexNoiseCache() { OpenSimplexNoise = new OpenSimplexNoise(0),
+                ParallelTextureCalculator = parallelTextureCalculator,
                 Seed = 0,
                 Scale = 64,
                 Dimension = Dimensions.Dimension.TwoD,
                 Vector = new Vector4(0),
-                HighResCache = parallelTextureCalculator.Calculate()
+                HighResCache = parallelTextureCalculator.Calculate(new Vector4(0), new Rectangle(new Point(0, 0), new Size(64, 64)))
             };
             //HighResCache = CalculateNoiseTexture(width * 4, height * 4, new Vector4(0), 0)};
         }
@@ -94,15 +97,19 @@ namespace Nodex.Classes.Nodes.Textures
             int seed = 0;
             int scale = 0;
             Dimensions.Dimension dimension = Dimensions.Dimension.TwoD;
+            Vector4 vector = new Vector4(0);
 
             App.Current.Dispatcher.Invoke(() =>
             {
                 seed = ((IntegerUpDown)properties[1].propertyElement).Value;
                 scale = ((IntegerUpDown)properties[2].propertyElement).Value;
                 dimension = (Dimensions.Dimension)((ComboBox)properties[0].propertyElement).SelectedIndex;
+                if (inputs[0].connectedNodeIOs != null && inputs[0].connectedNodeIOs[0].value != null)
+                    vector = (Vector4)inputs[0].connectedNodeIOs[0].value;
+                Debugger.AddValue("vector: " + vector.ToString());
             });
 
-            if (!(noiseCache.Seed != seed || noiseCache.Scale != scale || noiseCache.Dimension != dimension) && bitmap != null)
+            if (!(noiseCache.Seed != seed || noiseCache.Scale != scale || noiseCache.Dimension != dimension || noiseCache.Vector != vector) && bitmap != null)
             {
                 return new object[] { bitmap };
             }
@@ -110,19 +117,19 @@ namespace Nodex.Classes.Nodes.Textures
             width = (int)App.Current.Properties["imageWidth"];
             height = (int)App.Current.Properties["imageHeight"];
 
+            Rectangle cropRect = new Rectangle((int)vector.X, (int)vector.Y, scale, scale);
+
             if (noiseCache.Seed != seed)
-            {
-                ParallelTextureCalculator parallelTextureCalculator = new ParallelTextureCalculator(new OpenSimplexNoise(seed), width * 8, height * 8, 1024, 1024, 8);
-                noiseCache.HighResCache = parallelTextureCalculator.Calculate();
+                noiseCache.ParallelTextureCalculator = new ParallelTextureCalculator(new OpenSimplexNoise(seed), width, height, 8, vector, new Size(128, 128));
+            //noiseCache.Vector != vector
+            noiseCache.HighResCache = noiseCache.ParallelTextureCalculator.Calculate(vector, cropRect);
                 //noiseCache.HighResCache = CalculateNoiseTexture(width * 4, height * 4, new Vector4(0), seed);
-            }
 
             noiseCache.Dimension = dimension;
             noiseCache.Seed = seed;
             noiseCache.Scale = scale;
             double scaleSquared = scale ^ 2;
 
-            Rectangle cropRect = new Rectangle(0, 0, scale, scale);
             //Bitmap sourceBitmap = noiseCache.HighResCache;
             //Bitmap targetBitmap = new Bitmap(cropRect.Width, cropRect.Height);
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,27 +12,36 @@ namespace Nodex.Classes.Threading
     public class ParallelTextureCalculator
     {
         public ITexture Texture { get; }
-        public int ResolutionX { get; }
-        public int ResolutionY { get; }
+        public int ResolutionX { get; private set; }
+        public int ResolutionY { get; private set; }
         public int TileSizeX { get; }
         public int TileSizeY { get; }
         public float Scale { get; }
-        private Chunk[] chunks;
+        public Vector4 Vector { get; private set; }
+        private List<List<Chunk>> chunks;
         private int chunksX;
         private int chunksY;
+        private double previousZ;
+        private double previousW;
+        private Rectangle bounds;
+        private Bitmap cachedBitmap;
 
-        public ParallelTextureCalculator(ITexture texture, int resolutionX, int resolutionY, int tileSizeX, int tileSizeY, float scale)
+        public ParallelTextureCalculator(ITexture texture, int tileSizeX, int tileSizeY, float scale, Vector4 vector, Size size)
         {
             Texture = texture;
-            ResolutionX = resolutionX;
-            ResolutionY = resolutionY;
+            ResolutionX = ExtraMath.CeilingStep(size.Width, tileSizeX);
+            ResolutionY = ExtraMath.CeilingStep(size.Height, tileSizeY);
             TileSizeX = tileSizeX;
             TileSizeY = tileSizeY;
             Scale = scale;
+            previousZ = vector.Z;
+            previousW = vector.W;
+            Vector = vector;
+            bounds = new Rectangle(new Point(ExtraMath.FloorStep(vector.X, tileSizeX), ExtraMath.FloorStep(vector.Y, tileSizeY)), new Size(ResolutionX, ResolutionY));
 
-            int resolutionXRemainder = resolutionX;
+            int resolutionXRemainder = ResolutionX;
             int chunksX = 0;
-            for (int i = 0; i < resolutionX; i += tileSizeX)
+            for (int i = 0; i < ResolutionX; i += tileSizeX)
             {
                 resolutionXRemainder -= tileSizeX;
                 chunksX++;
@@ -39,9 +49,9 @@ namespace Nodex.Classes.Threading
             if (resolutionXRemainder > 0)
                 chunksX++;
 
-            int resolutionYRemainder = resolutionY;
+            int resolutionYRemainder = ResolutionY;
             int chunksY = 0;
-            for (int i = 0; i < resolutionY; i += tileSizeY)
+            for (int i = 0; i < ResolutionY; i += tileSizeY)
             {
                 resolutionYRemainder -= tileSizeY;
                 chunksY++;
@@ -52,7 +62,10 @@ namespace Nodex.Classes.Threading
             this.chunksX = chunksX;
             this.chunksY = chunksY;
 
-            chunks = new Chunk[chunksX * chunksY];
+
+            chunks = new List<List<Chunk>>();
+
+            //bounds = new Rectangle(new Point((int)vector.X, (int)vector.Y), new Size(ResolutionX, ResolutionY));
 
             //if (resolutionXRemainder > 0 && resolutionYRemainder > 0)
             //{
@@ -90,83 +103,132 @@ namespace Nodex.Classes.Threading
             //}
             //else
             //{
-                for (int i = 0; i < chunksX * chunksY; i++)
-                {
-                    chunks[i] = new Chunk(texture, tileSizeX - 1, tileSizeY - 1);
-                }
+
             //}
         }
 
-        public Bitmap Calculate()
+        public Bitmap Calculate(Vector4 vector, Rectangle cropRectangle)
         {
-            int temp = chunks.Length;
-            List<Thread> threads = new List<Thread>();
-            Bitmap[] bitmaps = new Bitmap[temp];
+            Vector = vector;
 
-            for (int i = 0; i < temp; i++)
+            if (!(vector.Z == previousZ && vector.W == previousZ))
             {
-                // / (chunksX * TileSizeX)
-                int offsetY = (int)Math.Floor((float)i / chunksX) * TileSizeY;
-                //int offsetX = (int)(Math.Ceiling((float)i / ResolutionX) * TileSizeX);
-                int offsetX = i * TileSizeX % ResolutionX;
-                int offsetYAddend = (int)Math.Floor((float)i / chunksX);
-
-                //Safety precations because I managed to fuck this loop up hard
-                if (i >= temp)
-                    goto OutOfLoop;
-                int iTemp = i;
-
-                Thread thread = new Thread(() => { bitmaps[iTemp] = chunks[iTemp].Calculate(Scale, offsetX, offsetY); });
-                threads.Add(thread);
-                thread.Start();
-                while (thread.ThreadState != ThreadState.Running)
-                    Thread.Sleep(2); //Wait a bit because threads are dumb
-                thread.IsBackground = true;
+                foreach (List<Chunk> list in chunks)
+                {
+                    foreach (Chunk chunk in list)
+                    {
+                        chunk.ClearBitmap();
+                    }
+                }
             }
 
-OutOfLoop:
+            if (bounds.Contains(cropRectangle) && cachedBitmap != null && vector.Z == previousZ && vector.W == previousZ)
+            {
+                return cachedBitmap;
+            }
+
+            previousZ = vector.Z;
+            previousW = vector.W;
+            ResolutionX = ExtraMath.CeilingStep(cropRectangle.Width + (cropRectangle.X % TileSizeX), TileSizeX);
+            ResolutionY = ExtraMath.CeilingStep(cropRectangle.Height + (cropRectangle.Y % TileSizeY), TileSizeY);
+            Debugger.AddValue("ResX: " + ResolutionX);
+            Debugger.AddValue("ResY: " + ResolutionY);
+            int boundsX = ExtraMath.FloorStep(cropRectangle.X, TileSizeX);
+            int boundsY = ExtraMath.FloorStep(cropRectangle.Y, TileSizeY);
+            bounds = new Rectangle(new Point(boundsX, boundsY), new Size(ResolutionX, ResolutionY));
+            Debugger.AddValue(bounds.ToString());
+
+            List<Thread> threads = new List<Thread>();
+
+            for (int y = bounds.Y; y < bounds.Height + bounds.Y; y += TileSizeY)
+            {
+                int row = ExtraMath.FloorStep(y, 512) / 512;
+                if (row >= chunks.Count)
+                {
+                    chunks.Add(new List<Chunk>());
+
+                }
+                for (int x = bounds.X; x < bounds.Width + bounds.X; x += TileSizeX)
+                {
+                    int column = ExtraMath.FloorStep(x, 512) / 512;
+                    if (column == chunks[row].Count)
+                    {
+                        chunks[row].Add(new Chunk(Texture, TileSizeX, TileSizeY, new Vector2(x, y)));
+                    }
+                    else if (column > chunks[row].Count)
+                    {
+                        while (chunks[row].Count <= column)
+                        {
+                            chunks[row].Add(new Chunk(Texture, TileSizeX, TileSizeY, new Vector2(chunks[row].Count * TileSizeX, (chunks.Count - 1) * TileSizeY)));
+                        }
+                    }
+                    //foreach (Chunk chunk in chunks[row])
+                    //{
+                    if (chunks[row][column].Bitmap == null)
+                    {
+                        Thread thread = new Thread(() =>
+                        {
+                            chunks[row][column].Calculate(Scale, Vector.Z, Vector.W);
+                        });
+                        threads.Add(thread);
+                        thread.Start();
+                        while (thread.ThreadState != ThreadState.Running)
+                            Thread.Sleep(2);
+                        thread.IsBackground = true;
+                    }
+                    //}
+                }
+            }
+
+            //for (int i = 0; i < chunksX * chunksY; i++)
+            //{
+            //    chunks.Add(new Chunk(Texture, TileSizeX - 1, TileSizeY - 1));
+            //}
+
+            //int temp = chunks.Count;
+
+
+            //for (int i = 0; i < temp; i++)
+            //{
+            //    // / (chunksX * TileSizeX)
+            //    int offsetY = (int)Math.Floor((float)i / chunksX) * TileSizeY;
+            //    //int offsetX = (int)(Math.Ceiling((float)i / ResolutionX) * TileSizeX);
+            //    int offsetX = i * TileSizeX % ResolutionX;
+            //    int offsetYAddend = (int)Math.Floor((float)i / chunksX);
+
+            //    int iTemp = i;
+
+            //    Thread thread = new Thread(() => { bitmaps[iTemp] = chunks[iTemp].Calculate(Scale, Vector.Z, Vector.W); });
+            //    threads.Add(thread);
+            //    thread.Start();
+            //    while (thread.ThreadState != ThreadState.Running)
+            //        Thread.Sleep(2);
+            //    thread.IsBackground = true;
+            //}
 
             foreach (Thread thread in threads)
             {
                 thread.Join();
-                Thread.Sleep(2); //Wait a bit because threads are dumb
             }
 
-            foreach (var item in bitmaps)
-            {
-                while (item == null)
-                    Thread.Sleep(4);
-            }
-
-            foreach (Thread thread in threads)
-            {
-                if (thread.IsAlive)
-                {
-                    
-                    thread.Abort();
-                }
-            }
-
-            Thread.Sleep(4);
-
-            return MergeBitmaps(bitmaps);
+            cachedBitmap = MergeBitmaps(chunks);
+            return cachedBitmap;
         }
 
-        private Bitmap MergeBitmaps(Bitmap[] bitmaps)
+        private Bitmap MergeBitmaps(List<List<Chunk>> chunks)
         {
-            Bitmap returnBitmap = new Bitmap(ResolutionX, ResolutionY);
+            Bitmap returnBitmap = new Bitmap(ExtraMath.CeilingStep(bounds.Width + bounds.X, TileSizeX), ExtraMath.CeilingStep(bounds.Height + bounds.Y, TileSizeY));
             using (Graphics gfx = Graphics.FromImage(returnBitmap))
             {
-                int offsetX = 0;
-                int offsetY = 0;
-                foreach (Bitmap bitmap in bitmaps)
+                //TODO: make this use the offset
+                foreach (List<Chunk> row in chunks)
                 {
-                    gfx.DrawImageUnscaled(bitmap, new Point(offsetX, offsetY));
-                    offsetX += TileSizeX;
-                    if (offsetX > ResolutionX)
+                    foreach (Chunk chunk in row)
                     {
-                        offsetX = 0;
-                        offsetY += TileSizeY;
+                        if (bounds.IntersectsWith(chunk.Boundary))
+                        {
+                            gfx.DrawImageUnscaled(chunk.Bitmap, new Point((int)chunk.Position.X, (int)chunk.Position.Y));
+                        }
                     }
                 }
             }

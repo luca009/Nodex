@@ -71,7 +71,11 @@ namespace Nodex.Resources.Controls
                 case NodeIO.NodeIOCategory.Number:
                     ellipseIn.Fill = new LinearGradientBrush(Color.FromRgb(255, 255, 255), Color.FromRgb(90, 90, 90), 90);
                     break;
+                case NodeIO.NodeIOCategory.Vector:
+                    ellipseIn.Fill = new LinearGradientBrush(Color.FromRgb(110, 50, 255), Color.FromRgb(40, 0, 130), 90);
+                    break;
                 default:
+                    MessageBox.Show("Non-serious error, no Ellipse.Fill was defined for the NodeIOCategory in NodeInputControl.");
                     break;
             }
         }
