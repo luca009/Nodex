@@ -71,19 +71,22 @@ namespace Nodex.Classes.Nodes
                 {
                     case Bitmap bitmap:
                         //Resize Image if neccessary
-                        if (bitmap.Width != width || bitmap.Height != height)
+                        //if (bitmap.Width != width || bitmap.Height != height)
                             bitmap = new Bitmap(bitmap, width, height);
 
                         App.Current.Dispatcher.Invoke(() => { bitmapSource = bitmap.ConvertToBitmapSource(); });
+                        bitmap.Dispose();
                         break;
                     case int integer:
-                        Bitmap bmp = new Bitmap(width, height);
-                        using (Graphics gfx = Graphics.FromImage(bmp))
-                        using (SolidBrush brush = new SolidBrush(System.Drawing.Color.FromArgb(integer, integer, integer)))
+                        using (Bitmap bmp = new Bitmap(width, height))
                         {
-                            gfx.FillRectangle(brush, 0, 0, width, height);
+                            using (Graphics gfx = Graphics.FromImage(bmp))
+                            using (SolidBrush brush = new SolidBrush(System.Drawing.Color.FromArgb(integer, integer, integer)))
+                            {
+                                gfx.FillRectangle(brush, 0, 0, width, height);
+                            }
+                            bitmapSource = bmp.ConvertToBitmapSource();
                         }
-                        bitmapSource = bmp.ConvertToBitmapSource();
                         break;
                     case Vector3 vector:
                         break;

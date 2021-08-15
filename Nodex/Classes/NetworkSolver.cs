@@ -200,7 +200,7 @@ namespace Nodex.Classes
         /// Loops through all nodes, populating all relevant outputs
         /// </summary>
         /// <param name="inputDictionary">Dictionary containing all NodeControls and their indexes</param>
-        private static async void CalculateOutput(Dictionary<NodeControl, int> inputDictionary)
+        private static void CalculateOutput(Dictionary<NodeControl, int> inputDictionary)
         {
             if ((bool)App.Current.Properties["imageCalculatingThreadRunning"])
             {

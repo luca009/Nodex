@@ -27,6 +27,9 @@ namespace Nodex.Classes
                 case IntegerUpDown integerUpDown:
                     integerUpDown.ValueChanged += ValueUpdated;
                     break;
+                case ComboBox comboBox:
+                    comboBox.SelectionChanged += ValueUpdated;
+                    break;
                 default:
                     break;
             }

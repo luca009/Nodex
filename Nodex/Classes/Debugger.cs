@@ -14,5 +14,11 @@ namespace Nodex.Classes
             DebugWindow debugWindow = ((MainWindow)App.Current.MainWindow).debugWindow;
             debugWindow.listboxInfo.Items.Add(obj);
         }
+
+        public static void Clear()
+        {
+            DebugWindow debugWindow = ((MainWindow)App.Current.MainWindow).debugWindow;
+            debugWindow.listboxInfo.Items.Clear();
+        }
     }
 }

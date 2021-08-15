@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nodex.Classes.TextureGenerators
 {
-    class Dimensions
+    public class Dimensions
     {
         public enum Dimension
         {

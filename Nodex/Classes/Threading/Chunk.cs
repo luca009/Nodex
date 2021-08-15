@@ -34,16 +34,49 @@ namespace Nodex.Classes.Threading
             Boundary = new Rectangle((int)position.X, (int)position.Y, xSize, ySize);
         }
 
-        public void Calculate(float scale, double offsetZ, double offsetW)
+        public void Calculate(double scale)
         {
             Bitmap bitmap = new Bitmap(SizeX, SizeY);
             for (int x = 0; x < SizeX; x++)
             {
+                double evaluateX = (x + Position.X) / scale;
                 for (int y = 0; y < SizeY; y++)
                 {
-                    int pixelBrightness = (int)((Texture.Evaluate((x + Position.X) / scale, (y + Position.Y) / scale, offsetZ, offsetW) + 1) * 127.5);
+                    int pixelBrightness = (int)((Texture.Evaluate(evaluateX, (y + Position.Y) / scale) + 1) * 127.5);
                     bitmap.SetPixel(x, y, Color.FromArgb(pixelBrightness, pixelBrightness, pixelBrightness));
-                    //Console.WriteLine($"{{{x},{y}}}: {pixelBrightness}");
+                }
+            }
+
+            Bitmap = bitmap;
+        }
+        public void Calculate(double scale, double offsetZ)
+        {
+            Bitmap bitmap = new Bitmap(SizeX, SizeY);
+            double evaluateZ = offsetZ / scale;
+            for (int x = 0; x < SizeX; x++)
+            {
+                double evaluateX = (x + Position.X) / scale;
+                for (int y = 0; y < SizeY; y++)
+                {
+                    int pixelBrightness = (int)((Texture.Evaluate(evaluateX, (y + Position.Y) / scale, evaluateZ) + 1) * 127.5);
+                    bitmap.SetPixel(x, y, Color.FromArgb(pixelBrightness, pixelBrightness, pixelBrightness));
+                }
+            }
+
+            Bitmap = bitmap;
+        }
+        public void Calculate(double scale, double offsetZ, double offsetW)
+        {
+            Bitmap bitmap = new Bitmap(SizeX, SizeY);
+            double evaluateZ = offsetZ / scale;
+            double evaluateW = offsetW / scale;
+            for (int x = 0; x < SizeX; x++)
+            {
+                double evaluateX = (x + Position.X) / scale;
+                for (int y = 0; y < SizeY; y++)
+                {
+                    int pixelBrightness = (int)((Texture.Evaluate(evaluateX, (y + Position.Y) / scale, evaluateZ, evaluateW) + 1) * 127.5);
+                    bitmap.SetPixel(x, y, Color.FromArgb(pixelBrightness, pixelBrightness, pixelBrightness));
                 }
             }
 

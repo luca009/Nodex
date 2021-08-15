@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static Nodex.Classes.TextureGenerators.Dimensions;
 
 namespace Nodex.Classes.Threading
 {
@@ -16,8 +17,9 @@ namespace Nodex.Classes.Threading
         public int ResolutionY { get; private set; }
         public int TileSizeX { get; }
         public int TileSizeY { get; }
-        public float Scale { get; }
+        public double Scale { get; }
         public Vector4 Vector { get; private set; }
+        public Dimension Dimension { get; private set; }
         private List<List<Chunk>> chunks;
         private int chunksX;
         private int chunksY;
@@ -26,7 +28,7 @@ namespace Nodex.Classes.Threading
         private Rectangle bounds;
         private Bitmap cachedBitmap;
 
-        public ParallelTextureCalculator(ITexture texture, int tileSizeX, int tileSizeY, float scale, Vector4 vector, Size size)
+        public ParallelTextureCalculator(ITexture texture, int tileSizeX, int tileSizeY, double scale, Vector4 vector, Size size, Dimension dimension)
         {
             Texture = texture;
             ResolutionX = ExtraMath.CeilingStep(size.Width, tileSizeX);
@@ -34,6 +36,7 @@ namespace Nodex.Classes.Threading
             TileSizeX = tileSizeX;
             TileSizeY = tileSizeY;
             Scale = scale;
+            Dimension = dimension;
             previousZ = vector.Z;
             previousW = vector.W;
             Vector = vector;
@@ -107,11 +110,17 @@ namespace Nodex.Classes.Threading
             //}
         }
 
-        public Bitmap Calculate(Vector4 vector, Rectangle cropRectangle)
+        public Bitmap SetDimensionAndRecalculate(Dimension dimension)
+        {
+            Dimension = dimension;
+            return Calculate(Vector, bounds, true);
+        }
+
+        public Bitmap Calculate(Vector4 vector, Rectangle cropRectangle, bool forceRecalculate = false)
         {
             Vector = vector;
 
-            if (!(vector.Z == previousZ && vector.W == previousZ))
+            if (forceRecalculate)
             {
                 foreach (List<Chunk> list in chunks)
                 {
@@ -120,12 +129,59 @@ namespace Nodex.Classes.Threading
                         chunk.ClearBitmap();
                     }
                 }
+                goto ForceRecalculate;
             }
 
-            if (bounds.Contains(cropRectangle) && cachedBitmap != null && vector.Z == previousZ && vector.W == previousZ)
+            switch (Dimension)
             {
-                return cachedBitmap;
+                case Dimension.ThreeD:
+                    if (!(vector.Z == previousZ))
+                    {
+                        foreach (List<Chunk> list in chunks)
+                        {
+                            foreach (Chunk chunk in list)
+                            {
+                                chunk.ClearBitmap();
+                            }
+                        }
+                    }
+                    break;
+                case Dimension.FourD:
+                    if (!(vector.Z == previousZ && vector.W == previousZ))
+                    {
+                        foreach (List<Chunk> list in chunks)
+                        {
+                            foreach (Chunk chunk in list)
+                            {
+                                chunk.ClearBitmap();
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    break;
             }
+            
+
+            switch (Dimension)
+            {
+                case Dimension.TwoD:
+                    if (bounds.Contains(cropRectangle) && cachedBitmap != null)
+                        return cachedBitmap;
+                    break;
+                case Dimension.ThreeD:
+                    if (bounds.Contains(cropRectangle) && cachedBitmap != null && vector.Z == previousZ)
+                        return cachedBitmap;
+                    break;
+                case Dimension.FourD:
+                    if (bounds.Contains(cropRectangle) && cachedBitmap != null && vector.Z == previousZ && vector.W == previousW)
+                        return cachedBitmap;
+                    break;
+                default:
+                    break;
+            }
+
+        ForceRecalculate:
 
             previousZ = vector.Z;
             previousW = vector.W;
@@ -142,19 +198,17 @@ namespace Nodex.Classes.Threading
 
             for (int y = bounds.Y; y < bounds.Height + bounds.Y; y += TileSizeY)
             {
-                int row = ExtraMath.FloorStep(y, 512) / 512;
+                int row = ExtraMath.FloorStep(y, TileSizeY) / TileSizeY;
+
                 if (row >= chunks.Count)
-                {
                     chunks.Add(new List<Chunk>());
 
-                }
                 for (int x = bounds.X; x < bounds.Width + bounds.X; x += TileSizeX)
                 {
-                    int column = ExtraMath.FloorStep(x, 512) / 512;
+                    int column = ExtraMath.FloorStep(x, TileSizeX) / TileSizeX;
+
                     if (column == chunks[row].Count)
-                    {
                         chunks[row].Add(new Chunk(Texture, TileSizeX, TileSizeY, new Vector2(x, y)));
-                    }
                     else if (column > chunks[row].Count)
                     {
                         while (chunks[row].Count <= column)
@@ -166,10 +220,31 @@ namespace Nodex.Classes.Threading
                     //{
                     if (chunks[row][column].Bitmap == null)
                     {
-                        Thread thread = new Thread(() =>
+                        Thread thread = new Thread(() => { throw new Exception("ParallelTextureGenerator: The threads' content wasn't set."); });
+                        switch (Dimension)
                         {
-                            chunks[row][column].Calculate(Scale, Vector.Z, Vector.W);
-                        });
+                            case Dimension.TwoD:
+                                thread = new Thread(() =>
+                                {
+                                    chunks[row][column].Calculate(Scale);
+                                });
+                                break;
+                            case Dimension.ThreeD:
+                                thread = new Thread(() =>
+                                {
+                                    chunks[row][column].Calculate(Scale, Vector.Z);
+                                });
+                                break;
+                            case Dimension.FourD:
+                                thread = new Thread(() =>
+                                {
+                                    chunks[row][column].Calculate(Scale, Vector.Z, Vector.W);
+                                });
+                                break;
+                            default:
+                                break;
+                        }
+
                         threads.Add(thread);
                         thread.Start();
                         while (thread.ThreadState != ThreadState.Running)

@@ -64,7 +64,7 @@ namespace Nodex
             currentInitializingNode = null;
 
             debugWindow = new DebugWindow();
-            //debugWindow.Show();
+            debugWindow.Show();
 
             App.Current.Properties.Add("imageWidth", 512);
             App.Current.Properties.Add("imageHeight", 512);
