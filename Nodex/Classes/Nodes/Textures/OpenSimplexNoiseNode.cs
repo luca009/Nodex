@@ -78,7 +78,7 @@ namespace Nodex.Classes.Nodes.Textures
                 Scale = 64,
                 Dimension = Dimensions.Dimension.ThreeD,
                 Vector = new Vector4(0),
-                HighResCache = parallelTextureCalculator.Calculate(new Vector4(0), new Rectangle(new Point(0, 0), new Size(64, 64)))
+                HighResCache = parallelTextureCalculator.Calculate(new Vector4(0), new Rectangle(new Point(0, 0), new Size(64, 64)), true)
             };
             //HighResCache = CalculateNoiseTexture(width * 4, height * 4, new Vector4(0), 0)};
         }
@@ -147,7 +147,7 @@ namespace Nodex.Classes.Nodes.Textures
             if (noiseCache.Dimension != dimension)
                 noiseCache.HighResCache = noiseCache.ParallelTextureCalculator.SetDimensionAndRecalculate(dimension);
             else
-                noiseCache.HighResCache = noiseCache.ParallelTextureCalculator.Calculate(vector, cropRect);
+                noiseCache.HighResCache = noiseCache.ParallelTextureCalculator.Calculate(vector, cropRect, true);
             //noiseCache.HighResCache = CalculateNoiseTexture(width * 4, height * 4, new Vector4(0), seed);
 
             noiseCache.Dimension = dimension;

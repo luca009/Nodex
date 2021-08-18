@@ -96,7 +96,7 @@ namespace Nodex.Classes.Nodes
             }
             catch (Exception ex)
             {
-
+                throw new Exception();
             }
 
             App.Current.Dispatcher.Invoke(() => {

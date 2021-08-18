@@ -220,30 +220,10 @@ namespace Nodex.Classes.Threading
                     //{
                     if (chunks[row][column].Bitmap == null)
                     {
-                        Thread thread = new Thread(() => { throw new Exception("ParallelTextureGenerator: The threads' content wasn't set."); });
-                        switch (Dimension)
+                        Thread thread = new Thread(() =>
                         {
-                            case Dimension.TwoD:
-                                thread = new Thread(() =>
-                                {
-                                    chunks[row][column].Calculate(Scale);
-                                });
-                                break;
-                            case Dimension.ThreeD:
-                                thread = new Thread(() =>
-                                {
-                                    chunks[row][column].Calculate(Scale, Vector.Z);
-                                });
-                                break;
-                            case Dimension.FourD:
-                                thread = new Thread(() =>
-                                {
-                                    chunks[row][column].Calculate(Scale, Vector.Z, Vector.W);
-                                });
-                                break;
-                            default:
-                                break;
-                        }
+                            chunks[row][column].Calculate(Scale, Vector.Z, Vector.W, Dimension);
+                        });
 
                         threads.Add(thread);
                         thread.Start();
